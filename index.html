@@ -132,4 +132,133 @@
                 <div class="bg-slate-950 border border-slate-800/80 p-3 rounded-lg">
                     <label class="block text-xs font-bold text-indigo-400 mb-1">인간 인증 (Anti-Bot)</label>
                     <p class="text-xs text-slate-400 mb-2">다음 방정식의 올바른 해(값)를 입력하세요: <span class="text-white font-bold">12 - 4 = ?</span></p>
-                    <input type="text" id="signupCaptcha" placeholder="정답 숫자 입력" onkeydown="handleSignupEnter(event)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px
+                    <input type="text" id="signupCaptcha" placeholder="정답 숫자 입력" onkeydown="handleSignupEnter(event)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <button onclick="handleSignup()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">회원가입 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-slate-900 py-6 text-center text-xs text-slate-600">
+        &copy; 2026 MATHISM. All rights reserved.
+    </footer>
+
+    <!-- Supabase Integration Script -->
+    <script>
+        const SUPABASE_URL = 'https://yappoknkcvifkvimesmk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_cWfOvIPy8XWXGFgJACO2Tg_3bbL7Zhi';
+
+        let supabase = null;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (e) {
+            console.error("Supabase 초기화 오류:", e);
+        }
+
+        const modal = document.getElementById('authModal');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginTabBtn = document.getElementById('loginTabBtn');
+        const signupTabBtn = document.getElementById('signupTabBtn');
+        const authContainer = document.getElementById('authContainer');
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (!supabase) return;
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    renderLoggedInState(session.user.email);
+                }
+            } catch (err) {
+                console.error("세션 확인 중 오류:", err);
+            }
+        });
+
+        function openAuthModal() { modal.classList.remove('hidden'); }
+        function closeAuthModal() { modal.classList.add('hidden'); }
+
+        function switchTab(tab) {
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                loginTabBtn.className = "text-lg font-black text-indigo-400 border-b-2 border-indigo-500 pb-1";
+                signupTabBtn.className = "text-lg font-bold text-slate-500 pb-1";
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                signupTabBtn.className = "text-lg font-black text-indigo-400 border-b-2 border-indigo-500 pb-1";
+                loginTabBtn.className = "text-lg font-bold text-slate-500 pb-1";
+            }
+        }
+
+        function handleLoginEnter(e) { if (e.key === 'Enter') handleLogin(); }
+        function handleSignupEnter(e) { if (e.key === 'Enter') handleSignup(); }
+
+        async function handleSignup() {
+            if (!supabase) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPw').value.trim();
+            const captcha = document.getElementById('signupCaptcha').value.trim();
+
+            if (!email || !password) {
+                alert('이메일과 비밀번호를 모두 입력해주세요.');
+                return;
+            }
+
+            if (captcha !== '8') {
+                alert('인간 인증 방정식의 정답이 틀렸습니다.');
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                alert('회원가입 실패: ' + error.message);
+            } else {
+                alert('회원가입이 완료되었습니다! 로그인해 주세요.');
+                switchTab('login');
+                document.getElementById('loginEmail').value = email;
+            }
+        }
+
+        async function handleLogin() {
+            if (!supabase) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPw').value.trim();
+
+            if (!email || !password) {
+                alert('이메일과 비밀번호를 입력해주세요.');
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert('로그인 실패: ' + error.message);
+            } else {
+                closeAuthModal();
+                renderLoggedInState(email);
+                alert('환영합니다!');
+            }
+        }
+
+        function renderLoggedInState(email) {
+            authContainer.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-slate-300 font-semibold"><strong class="text-indigo-400">${email}</strong>님</span>
+                    <button onclick="handleLogout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-2 rounded-lg transition border border-slate-700">
+                        로그아웃
+                    </button>
+                </div>
+            `;
+        }
+
+        async function handleLogout() {
+            if (!supabase) return;
+            await supabase.auth.signOut();
+            location.reload();
+        }
+    </script>
+</body>
+</html>
