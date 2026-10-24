@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathism — Mathematical Problem Archive</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header / Navigation -->
+    <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.5</span>
+        </div>
+        <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
+            <a href="#problems" class="hover:text-indigo-400 transition">문제 은행</a>
+            <a href="#rankings" class="hover:text-indigo-400 transition">영역별 랭커</a>
+            <a href="#tiers" class="hover:text-indigo-400 transition">티어 시스템</a>
+        </nav>
+        <div id="authContainer">
+            <button onclick="openAuthModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-lg shadow-indigo-500/20 transition">
+                로그인 / 회원가입
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="w-full max-w-4xl mx-auto px-6 py-20 text-center flex-grow flex flex-col justify-center items-center">
+        <!-- Badge -->
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-indigo-400 font-medium mb-8">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            <span>엄밀한 수학적 사고와 논리를 검증하는 아카이브</span>
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
+            Interactive Mathematical<br>
+            <span class="bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent">
+                Problem Archive
+            </span>
+        </h1>
+
+        <!-- Slogan -->
+        <p class="text-base md:text-lg text-slate-400 max-w-2xl mb-10 leading-relaxed">
+            체계적으로 분류된 수학 문제를 풀고 실력을 기록하는 공간.<br>
+            브론즈부터 챌린저까지, 당신만의 페이스로 기록을 쌓아나갑니다.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+            <button class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                문제 풀기 시작하기
+            </button>
+            <button class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold px-8 py-4 rounded-xl border border-slate-800 transition">
+                랭킹 보드 보기
+            </button>
+        </div>
+
+        <!-- Tier System Preview -->
+        <div class="mt-16 text-xs text-slate-500 font-semibold tracking-widest uppercase mb-4">Tier System</div>
+        <div class="flex flex-wrap justify-center gap-3 text-xs font-bold">
+            <span class="px-3 py-1.5 rounded bg-amber-900/40 text-amber-500 border border-amber-800/50">Bronze</span>
+            <span class="px-3 py-1.5 rounded bg-slate-700/40 text-slate-300 border border-slate-600/50">Silver</span>
+            <span class="px-3 py-1.5 rounded bg-yellow-600/30 text-yellow-400 border border-yellow-600/40">Gold</span>
+            <span class="px-3 py-1.5 rounded bg-cyan-900/40 text-cyan-400 border border-cyan-800/50">Platinum</span>
+            <span class="px-3 py-1.5 rounded bg-emerald-900/40 text-emerald-400 border border-emerald-800/50">Diamond</span>
+            <span class="px-3 py-1.5 rounded bg-violet-900/40 text-violet-400 border border-violet-800/50">Master</span>
+            <span class="px-3 py-1.5 rounded bg-rose-900/40 text-rose-400 border border-rose-800/50">Challenger</span>
+        </div>
+
+        <!-- Features Preview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mt-24 text-left">
+            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl backdrop-blur">
+                <div class="text-indigo-400 font-black text-xl mb-2">01. Problem Archive</div>
+                <p class="text-sm text-slate-400">대수학, 정수론, 조합론, 기하학 등 난이도별로 정돈된 고품질 수학 문제 모음.</p>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl backdrop-blur">
+                <div class="text-indigo-400 font-black text-xl mb-2">02. Verified Solutions</div>
+                <p class="text-sm text-slate-400">제출한 답안을 정확하게 검증하고, 단계별 풀이 과정을 기록할 수 있는 시스템.</p>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl backdrop-blur">
+                <div class="text-indigo-400 font-black text-xl mb-2">03. Progress Tracking</div>
+                <p class="text-sm text-slate-400">개인별 학습 통계와 티어 변동을 한눈에 파악하며 꾸준히 성장하는 피드백.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex justify-center items-center px-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-8 rounded-2xl shadow-2xl relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white font-bold text-lg">✕</button>
+
+            <!-- Tabs -->
+            <div class="flex space-x-4 border-b border-slate-800 pb-4 mb-6">
+                <button onclick="switchTab('login')" id="loginTabBtn" class="text-lg font-black text-indigo-400 border-b-2 border-indigo-500 pb-1">로그인</button>
+                <button onclick="switchTab('signup')" id="signupTabBtn" class="text-lg font-bold text-slate-500 pb-1">회원가입</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">이메일</label>
+                    <input type="email" id="loginEmail" placeholder="example@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">비밀번호</label>
+                    <input type="password" id="loginPw" placeholder="비밀번호 입력" onkeydown="handleLoginEnter(event)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">로그인</button>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">이메일 주소</label>
+                    <input type="email" id="signupEmail" placeholder="example@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">비밀번호 (6자리 이상)</label>
+                    <input type="password" id="signupPw" placeholder="비밀번호 설정" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <!-- Human Verification (인간 인증) -->
+                <div class="bg-slate-950 border border-slate-800/80 p-3 rounded-lg">
+                    <label class="block text-xs font-bold text-indigo-400 mb-1">인간 인증 (Anti-Bot)</label>
+                    <p class="text-xs text-slate-400 mb-2">다음 방정식의 올바른 해(값)를 입력하세요: <span class="text-white font-bold">12 - 4 = ?</span></p>
+                    <input type="text" id="signupCaptcha" placeholder="정답 숫자 입력" onkeydown="handleSignupEnter(event)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px
