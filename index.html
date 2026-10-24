@@ -149,9 +149,9 @@
         const SUPABASE_URL = 'https://yappoknkcvifkvimesmk.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_cWfOvIPy8XWXGFgJACO2Tg_3bbL7Zhi';
 
-        let supabase = null;
+        let supabaseClient = null;
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (e) {
             console.error("Supabase 초기화 오류:", e);
         }
@@ -164,9 +164,9 @@
         const authContainer = document.getElementById('authContainer');
 
         window.addEventListener('DOMContentLoaded', async () => {
-            if (!supabase) return;
+            if (!supabaseClient) return;
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
                     renderLoggedInState(session.user.email);
                 }
@@ -196,7 +196,7 @@
         function handleSignupEnter(e) { if (e.key === 'Enter') handleSignup(); }
 
         async function handleSignup() {
-            if (!supabase) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
+            if (!supabaseClient) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPw').value.trim();
             const captcha = document.getElementById('signupCaptcha').value.trim();
@@ -211,7 +211,7 @@
                 return;
             }
 
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
 
             if (error) {
                 alert('회원가입 실패: ' + error.message);
@@ -223,7 +223,7 @@
         }
 
         async function handleLogin() {
-            if (!supabase) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
+            if (!supabaseClient) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPw').value.trim();
 
@@ -232,7 +232,7 @@
                 return;
             }
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
             if (error) {
                 alert('로그인 실패: ' + error.message);
@@ -255,8 +255,8 @@
         }
 
         async function handleLogout() {
-            if (!supabase) return;
-            await supabase.auth.signOut();
+            if (!supabaseClient) return;
+            await supabaseClient.auth.signOut();
             location.reload();
         }
     </script>
