@@ -236,7 +236,7 @@
     <script>
         const SUPABASE_URL = 'https://yappoknkcvifkvimesmk.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_cWfOvIPy8XWXGFgJACO2Tg_3bbL7Zhi';
-        const DEVELOPER_EMAIL = '본인구글이메일@gmail.com'; // 본인의 구글 이메일로 변경하세요 (관리자 삭제 권한)
+        const DEVELOPER_EMAIL = 'jun191217@gmail.com'; // 관리자 이메일 정상 반영
 
         let supabaseClient = null;
         try {
@@ -254,7 +254,7 @@
         let currentUser = null;
         let currentProblemAnswer = ''; 
         let currentProblemId = null;
-        let allProblemsCache = []; // 검색을 위한 문제 데이터 캐시
+        let allProblemsCache = []; 
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!supabaseClient) return;
@@ -433,7 +433,6 @@
             });
         }
 
-        // 실시간 검색 필터링 함수
         function filterProblemTable() {
             const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
             const filtered = allProblemsCache.filter(prob => 
@@ -460,7 +459,6 @@
                 imgContainer.classList.add('hidden');
             }
 
-            // 작성자 본인이거나 개발자(관리자) 이메일일 경우 삭제 버튼 노출
             const deleteBtn = document.getElementById('deleteProblemBtn');
             const isDeveloper = currentUser && currentUser.email === DEVELOPER_EMAIL;
             const isAuthor = currentUser && currentUser.id === prob.user_id;
