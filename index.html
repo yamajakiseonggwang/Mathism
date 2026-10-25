@@ -19,7 +19,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.6</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.7</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#problems" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -64,34 +64,6 @@
                 랭킹 보드 보기
             </button>
         </div>
-
-        <!-- Tier System Preview -->
-        <div class="mt-16 text-xs text-slate-500 font-semibold tracking-widest uppercase mb-4">Tier System</div>
-        <div class="flex flex-wrap justify-center gap-3 text-xs font-bold">
-            <span class="px-3 py-1.5 rounded bg-amber-900/40 text-amber-500 border border-amber-800/50">Bronze</span>
-            <span class="px-3 py-1.5 rounded bg-slate-700/40 text-slate-300 border border-slate-600/50">Silver</span>
-            <span class="px-3 py-1.5 rounded bg-yellow-600/30 text-yellow-400 border border-yellow-600/40">Gold</span>
-            <span class="px-3 py-1.5 rounded bg-cyan-900/40 text-cyan-400 border border-cyan-800/50">Platinum</span>
-            <span class="px-3 py-1.5 rounded bg-emerald-900/40 text-emerald-400 border border-emerald-800/50">Diamond</span>
-            <span class="px-3 py-1.5 rounded bg-violet-900/40 text-violet-400 border border-violet-800/50">Master</span>
-            <span class="px-3 py-1.5 rounded bg-rose-900/40 text-rose-400 border border-rose-800/50">Challenger</span>
-        </div>
-
-        <!-- Features Preview -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mt-24 text-left">
-            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl backdrop-blur">
-                <div class="text-indigo-400 font-black text-xl mb-2">01. Problem Archive</div>
-                <p class="text-sm text-slate-400">대수학, 정수론, 조합론, 기하학 등 난이도별로 정돈된 고품질 수학 문제 모음.</p>
-            </div>
-            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl backdrop-blur">
-                <div class="text-indigo-400 font-black text-xl mb-2">02. Verified Solutions</div>
-                <p class="text-sm text-slate-400">제출한 답안을 정확하게 검증하고, 단계별 풀이 과정을 기록할 수 있는 시스템.</p>
-            </div>
-            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl backdrop-blur">
-                <div class="text-indigo-400 font-black text-xl mb-2">03. Progress Tracking</div>
-                <p class="text-sm text-slate-400">개인별 학습 통계와 티어 변동을 한눈에 파악하며 꾸준히 성장하는 피드백.</p>
-            </div>
-        </div>
     </main>
 
     <!-- Auth Modal (Google Login Only) -->
@@ -117,6 +89,22 @@
         </div>
     </div>
 
+    <!-- Nickname Setup Modal -->
+    <div id="nicknameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex justify-center items-center px-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-8 rounded-2xl shadow-2xl relative text-left">
+            <h3 class="text-xl font-black text-white mb-2">닉네임 설정</h3>
+            <p class="text-xs text-slate-400 mb-6">MATHISM에서 사용할 닉네임을 입력해 주세요. (랭킹에 표시됩니다)</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">닉네임</label>
+                    <input type="text" id="nicknameInput" placeholder="예: 괴델, 오일러" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <button onclick="saveNickname()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">닉네임 저장하고 시작하기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="w-full border-t border-slate-900 py-6 text-center text-xs text-slate-600">
         &copy; 2026 MATHISM. All rights reserved.
@@ -135,14 +123,18 @@
         }
 
         const modal = document.getElementById('authModal');
+        const nicknameModal = document.getElementById('nicknameModal');
         const authContainer = document.getElementById('authContainer');
+
+        let currentUser = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!supabaseClient) return;
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
-                    renderLoggedInState(session.user.email);
+                    currentUser = session.user;
+                    await checkAndRenderProfile(currentUser);
                 }
             } catch (err) {
                 console.error("세션 확인 중 오류:", err);
@@ -155,7 +147,7 @@
         async function handleGoogleLogin() {
             if (!supabaseClient) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
             
-            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            const { error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
                     redirectTo: window.location.origin
@@ -167,10 +159,52 @@
             }
         }
 
-        function renderLoggedInState(email) {
+        async function checkAndRenderProfile(user) {
+            // profiles 테이블에서 닉네임 조회
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('nickname')
+                .eq('id', user.id)
+                .single();
+
+            if (!data || !data.nickname) {
+                // 닉네임이 없으면 닉네임 입력 모달 띄우기
+                nicknameModal.classList.remove('hidden');
+            } else {
+                // 닉네임이 있으면 상단 헤더에 렌더링
+                renderLoggedInState(data.nickname);
+            }
+        }
+
+        async function saveNickname() {
+            if (!currentUser) return;
+            const nickname = document.getElementById('nicknameInput').value.trim();
+
+            if (!nickname || nickname.length < 2) {
+                alert('닉네임은 2글자 이상 입력해주세요.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('profiles')
+                .upsert({ id: currentUser.id, nickname: nickname });
+
+            if (error) {
+                if (error.code === '23505') {
+                    alert('이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해 주세요.');
+                } else {
+                    alert('닉네임 저장 실패: ' + error.message);
+                }
+            } else {
+                nicknameModal.classList.add('hidden');
+                renderLoggedInState(nickname);
+            }
+        }
+
+        function renderLoggedInState(nickname) {
             authContainer.innerHTML = `
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-slate-300 font-semibold"><strong class="text-indigo-400">${email}</strong>님</span>
+                    <span class="text-sm text-slate-300 font-semibold"><strong class="text-indigo-400">${nickname}</strong>님</span>
                     <button onclick="handleLogout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-2 rounded-lg transition border border-slate-700">
                         로그아웃
                     </button>
