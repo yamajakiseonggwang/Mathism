@@ -19,7 +19,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.5</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.6</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#problems" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -28,7 +28,7 @@
         </nav>
         <div id="authContainer">
             <button onclick="openAuthModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-lg shadow-indigo-500/20 transition">
-                로그인 / 회원가입
+                로그인 / 시작하기
             </button>
         </div>
     </header>
@@ -57,7 +57,7 @@
 
         <!-- CTA Buttons -->
         <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-            <button class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+            <button onclick="openAuthModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
                 문제 풀기 시작하기
             </button>
             <button class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold px-8 py-4 rounded-xl border border-slate-800 transition">
@@ -94,48 +94,26 @@
         </div>
     </main>
 
-    <!-- Auth Modal -->
+    <!-- Auth Modal (Google Login Only) -->
     <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex justify-center items-center px-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-8 rounded-2xl shadow-2xl relative">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-8 rounded-2xl shadow-2xl relative text-center">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white font-bold text-lg">✕</button>
 
-            <!-- Tabs -->
-            <div class="flex space-x-4 border-b border-slate-800 pb-4 mb-6">
-                <button onclick="switchTab('login')" id="loginTabBtn" class="text-lg font-black text-indigo-400 border-b-2 border-indigo-500 pb-1">로그인</button>
-                <button onclick="switchTab('signup')" id="signupTabBtn" class="text-lg font-bold text-slate-500 pb-1">회원가입</button>
+            <div class="mb-6">
+                <h3 class="text-xl font-black text-white mb-2">MATHISM 시작하기</h3>
+                <p class="text-xs text-slate-400">구글 계정으로 간편하게 로그인하고 기록을 남기세요.</p>
             </div>
 
-            <!-- Login Form -->
-            <div id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">이메일</label>
-                    <input type="email" id="loginEmail" placeholder="example@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">비밀번호</label>
-                    <input type="password" id="loginPw" placeholder="비밀번호 입력" onkeydown="handleLoginEnter(event)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">로그인</button>
-            </div>
-
-            <!-- Signup Form -->
-            <div id="signupForm" class="space-y-4 hidden">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">이메일 주소</label>
-                    <input type="email" id="signupEmail" placeholder="example@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">비밀번호 (6자리 이상)</label>
-                    <input type="password" id="signupPw" placeholder="비밀번호 설정" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <!-- Human Verification (인간 인증) -->
-                <div class="bg-slate-950 border border-slate-800/80 p-3 rounded-lg">
-                    <label class="block text-xs font-bold text-indigo-400 mb-1">인간 인증 (Anti-Bot)</label>
-                    <p class="text-xs text-slate-400 mb-2">다음 방정식의 올바른 해(값)를 입력하세요: <span class="text-white font-bold">12 - 4 = ?</span></p>
-                    <input type="text" id="signupCaptcha" placeholder="정답 숫자 입력" onkeydown="handleSignupEnter(event)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <button onclick="handleSignup()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">회원가입 완료</button>
-            </div>
+            <!-- Google Login Button -->
+            <button onclick="handleGoogleLogin()" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-bold py-3.5 px-4 rounded-xl transition flex items-center justify-center space-x-3 shadow-lg">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.185v3.14C3.15 21.32 7.21 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.62H1.185C.43 8.14 0 9.87 0 12s.43 3.86 1.185 5.38l4.085-3.14z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.21 0 3.15 2.68 1.185 6.62l4.085 3.14c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                </svg>
+                <span class="text-sm font-bold">Google 계정으로 계속하기</span>
+            </button>
         </div>
     </div>
 
@@ -157,10 +135,6 @@
         }
 
         const modal = document.getElementById('authModal');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const loginTabBtn = document.getElementById('loginTabBtn');
-        const signupTabBtn = document.getElementById('signupTabBtn');
         const authContainer = document.getElementById('authContainer');
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -178,68 +152,18 @@
         function openAuthModal() { modal.classList.remove('hidden'); }
         function closeAuthModal() { modal.classList.add('hidden'); }
 
-        function switchTab(tab) {
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                signupForm.classList.add('hidden');
-                loginTabBtn.className = "text-lg font-black text-indigo-400 border-b-2 border-indigo-500 pb-1";
-                signupTabBtn.className = "text-lg font-bold text-slate-500 pb-1";
-            } else {
-                loginForm.classList.add('hidden');
-                signupForm.classList.remove('hidden');
-                signupTabBtn.className = "text-lg font-black text-indigo-400 border-b-2 border-indigo-500 pb-1";
-                loginTabBtn.className = "text-lg font-bold text-slate-500 pb-1";
-            }
-        }
-
-        function handleLoginEnter(e) { if (e.key === 'Enter') handleLogin(); }
-        function handleSignupEnter(e) { if (e.key === 'Enter') handleSignup(); }
-
-        async function handleSignup() {
+        async function handleGoogleLogin() {
             if (!supabaseClient) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPw').value.trim();
-            const captcha = document.getElementById('signupCaptcha').value.trim();
-
-            if (!email || !password) {
-                alert('이메일과 비밀번호를 모두 입력해주세요.');
-                return;
-            }
-
-            if (captcha !== '8') {
-                alert('인간 인증 방정식의 정답이 틀렸습니다.');
-                return;
-            }
-
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
 
             if (error) {
-                alert('회원가입 실패: ' + error.message);
-            } else {
-                alert('회원가입이 완료되었습니다! 로그인해 주세요.');
-                switchTab('login');
-                document.getElementById('loginEmail').value = email;
-            }
-        }
-
-        async function handleLogin() {
-            if (!supabaseClient) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPw').value.trim();
-
-            if (!email || !password) {
-                alert('이메일과 비밀번호를 입력해주세요.');
-                return;
-            }
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                alert('로그인 실패: ' + error.message);
-            } else {
-                closeAuthModal();
-                renderLoggedInState(email);
-                alert('환영합니다!');
+                alert('구글 로그인 실패: ' + error.message);
             }
         }
 
