@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        <!-- 2. Problems List View (Jungol/Baekjoon Style Table with Search) -->
+        <!-- 2. Problems List View -->
         <div id="problemsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -73,7 +73,6 @@
                     <p class="text-xs text-slate-400 mt-1">목록에서 문제를 클릭하여 상세 내용을 확인하고 풀이할 수 있습니다.</p>
                 </div>
                 <div class="flex items-center space-x-3 w-full md:w-auto">
-                    <!-- Search Input -->
                     <input type="text" id="searchInput" oninput="filterProblemTable()" placeholder="문제 제목 검색..." class="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 w-full md:w-48">
                     <button onclick="showSection('create')" id="registerBtnInList" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition whitespace-nowrap">
                         + 문제 등록
@@ -84,7 +83,6 @@
                 </div>
             </div>
 
-            <!-- Table -->
             <div class="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -127,8 +125,11 @@
             <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
                 <div class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Problem Description</div>
                 <p id="detailContent" class="text-slate-200 text-base font-medium whitespace-pre-wrap leading-relaxed"></p>
-                <div id="detailImageContainer" class="hidden my-4">
-                    <img id="detailImage" src="" alt="문제 이미지" class="max-h-96 rounded-xl border border-slate-800">
+                
+                <!-- 이미지 출력 영역 (오류 핸들링 추가) -->
+                <div id="detailImageContainer" class="hidden my-4 text-center">
+                    <img id="detailImage" src="" alt="문제 이미지" class="max-h-96 mx-auto rounded-xl border border-slate-800 object-contain" onerror="handleImageError()">
+                    <p id="imageErrorMsg" class="hidden text-xs text-rose-400 mt-2">이미지를 불러올 수 없습니다. (유효하지 않은 URL이거나 외부 접근이 차단된 주소입니다.)</p>
                 </div>
 
                 <div class="border-t border-slate-800 pt-6 space-y-4">
@@ -245,7 +246,7 @@
         </div>
     </div>
 
-    <!-- Nickname Setup Modal (First Login) -->
+    <!-- Nickname Setup Modal -->
     <div id="nicknameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex justify-center items-center px-4 z-50">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-8 rounded-2xl shadow-2xl relative text-left">
             <h3 class="text-xl font-black text-white mb-2">닉네임 설정</h3>
@@ -537,9 +538,15 @@
             document.getElementById('detailDate').textContent = new Date(prob.created_at).toLocaleDateString();
             document.getElementById('detailContent').textContent = prob.content;
             
+            // 이미지 처리 및 에러 메시지 초기화
             const imgContainer = document.getElementById('detailImageContainer');
             const imgEl = document.getElementById('detailImage');
+            const errorMsg = document.getElementById('imageErrorMsg');
+            
+            errorMsg.classList.add('hidden');
+
             if (prob.image_url) {
+                imgEl.style.display = 'block';
                 imgEl.src = prob.image_url;
                 imgContainer.classList.remove('hidden');
             } else {
@@ -559,6 +566,14 @@
             document.getElementById('detailUserAnswer').value = '';
             document.getElementById('detailResult').textContent = '';
             currentProblemAnswer = prob.answer;
+        }
+
+        // 이미지 로드 실패 시 호출되는 함수
+        function handleImageError() {
+            const imgEl = document.getElementById('detailImage');
+            const errorMsg = document.getElementById('imageErrorMsg');
+            imgEl.style.display = 'none';
+            errorMsg.classList.remove('hidden');
         }
 
         async function deleteCurrentProblem() {
