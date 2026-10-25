@@ -19,7 +19,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.7</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.8</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#problems" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -57,7 +57,7 @@
 
         <!-- CTA Buttons -->
         <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-            <button onclick="openAuthModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+            <button onclick="handleStartClick()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
                 문제 풀기 시작하기
             </button>
             <button class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold px-8 py-4 rounded-xl border border-slate-800 transition">
@@ -141,8 +141,24 @@
             }
         });
 
-        function openAuthModal() { modal.classList.remove('hidden'); }
+        function openAuthModal() {
+            // 이미 로그인된 상태면 로그인 모달 대신 안내
+            if (currentUser) {
+                alert('이미 로그인되어 있습니다!');
+                return;
+            }
+            modal.classList.remove('hidden');
+        }
         function closeAuthModal() { modal.classList.add('hidden'); }
+
+        // 문제 풀기 시작하기 버튼 클릭 시 처리
+        function handleStartClick() {
+            if (!currentUser) {
+                openAuthModal();
+            } else {
+                alert('문제 은행 페이지로 이동합니다! (다음 단계에서 구현 예정)');
+            }
+        }
 
         async function handleGoogleLogin() {
             if (!supabaseClient) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
@@ -160,7 +176,6 @@
         }
 
         async function checkAndRenderProfile(user) {
-            // profiles 테이블에서 닉네임 조회
             const { data, error } = await supabaseClient
                 .from('profiles')
                 .select('nickname')
@@ -168,10 +183,8 @@
                 .single();
 
             if (!data || !data.nickname) {
-                // 닉네임이 없으면 닉네임 입력 모달 띄우기
                 nicknameModal.classList.remove('hidden');
             } else {
-                // 닉네임이 있으면 상단 헤더에 렌더링
                 renderLoggedInState(data.nickname);
             }
         }
