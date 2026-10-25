@@ -19,50 +19,78 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.8</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v0.9</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
-            <a href="#problems" class="hover:text-indigo-400 transition">문제 은행</a>
+            <a href="#problems" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
             <a href="#rankings" class="hover:text-indigo-400 transition">영역별 랭커</a>
             <a href="#tiers" class="hover:text-indigo-400 transition">티어 시스템</a>
         </nav>
-        <div id="authContainer">
+        <div id="authContainer" class="flex items-center space-x-3">
             <button onclick="openAuthModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-lg shadow-indigo-500/20 transition">
                 로그인 / 시작하기
             </button>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <main class="w-full max-w-4xl mx-auto px-6 py-20 text-center flex-grow flex flex-col justify-center items-center">
-        <!-- Badge -->
-        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-indigo-400 font-medium mb-8">
-            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-            <span>엄밀한 수학적 사고와 논리를 검증하는 아카이브</span>
+    <!-- Hero / Main Section -->
+    <main class="w-full max-w-4xl mx-auto px-6 py-12 text-center flex-grow flex flex-col justify-center items-center">
+        
+        <!-- Home View -->
+        <div id="homeView" class="w-full flex flex-col items-center">
+            <!-- Badge -->
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-indigo-400 font-medium mb-8">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                <span>엄밀한 수학적 사고와 논리를 검증하는 아카이브</span>
+            </div>
+
+            <!-- Main Title -->
+            <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
+                Interactive Mathematical<br>
+                <span class="bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent">
+                    Problem Archive
+                </span>
+            </h1>
+
+            <!-- Slogan -->
+            <p class="text-base md:text-lg text-slate-400 max-w-2xl mb-10 leading-relaxed">
+                체계적으로 분류된 수학 문제를 풀고 실력을 기록하는 공간.<br>
+                브론즈부터 챌린저까지, 당신만의 페이스로 기록을 쌓아나갑니다.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto justify-center">
+                <button onclick="showSection('problems')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                    문제 풀러 가기
+                </button>
+                <button onclick="openProblemModal()" id="registerBtn" class="hidden bg-slate-900 hover:bg-slate-800 text-indigo-400 font-bold px-8 py-4 rounded-xl border border-indigo-500/30 transition">
+                    + 새 문제 등록하기
+                </button>
+            </div>
         </div>
 
-        <!-- Main Title -->
-        <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
-            Interactive Mathematical<br>
-            <span class="bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent">
-                Problem Archive
-            </span>
-        </h1>
+        <!-- Problems View (Hidden by default) -->
+        <div id="problemsView" class="w-full hidden text-left">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-2xl font-black text-white">문제 은행</h2>
+                    <p class="text-xs text-slate-400 mt-1">등록된 수학 문제를 풀고 정답을 검증해보세요.</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="openProblemModal()" id="registerBtnInList" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition">
+                        + 문제 등록
+                    </button>
+                    <button onclick="showSection('home')" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs px-4 py-2.5 rounded-lg border border-slate-800 transition">
+                        홈으로
+                    </button>
+                </div>
+            </div>
 
-        <!-- Slogan -->
-        <p class="text-base md:text-lg text-slate-400 max-w-2xl mb-10 leading-relaxed">
-            체계적으로 분류된 수학 문제를 풀고 실력을 기록하는 공간.<br>
-            브론즈부터 챌린저까지, 당신만의 페이스로 기록을 쌓아나갑니다.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-            <button onclick="handleStartClick()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
-                문제 풀기 시작하기
-            </button>
-            <button class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold px-8 py-4 rounded-xl border border-slate-800 transition">
-                랭킹 보드 보기
-            </button>
+            <!-- Problem List Container -->
+            <div id="problemList" class="space-y-6">
+                <!-- Loaded dynamically -->
+                <div class="text-center py-12 text-slate-500 text-sm">문제를 불러오는 중...</div>
+            </div>
         </div>
     </main>
 
@@ -76,7 +104,6 @@
                 <p class="text-xs text-slate-400">구글 계정으로 간편하게 로그인하고 기록을 남기세요.</p>
             </div>
 
-            <!-- Google Login Button -->
             <button onclick="handleGoogleLogin()" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-bold py-3.5 px-4 rounded-xl transition flex items-center justify-center space-x-3 shadow-lg">
                 <svg class="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
@@ -98,9 +125,34 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 mb-1">닉네임</label>
-                    <input type="text" id="nicknameInput" placeholder="예: 괴델, 오일러" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="nicknameInput" placeholder="" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
                 </div>
                 <button onclick="saveNickname()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">닉네임 저장하고 시작하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Problem Registration Modal -->
+    <div id="problemModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex justify-center items-center px-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg p-8 rounded-2xl shadow-2xl relative text-left">
+            <button onclick="closeProblemModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white font-bold text-lg">✕</button>
+            <h3 class="text-xl font-black text-white mb-2">새 수학 문제 등록</h3>
+            <p class="text-xs text-slate-400 mb-6">문제 내용, 이미지 URL, 정답을 입력해 주세요.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">문제 내용</label>
+                    <textarea id="probContent" rows="3" placeholder="문제를 입력하세요 (예: 방정식 2x = 4의 해를 구하시오)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">이미지 주소 (URL - 선택사항)</label>
+                    <input type="text" id="probImage" placeholder="https://example.com/image.png" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">정답</label>
+                    <input type="text" id="probAnswer" placeholder="정답 입력 (예: 2 또는 1/2 또는 0.5)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <button onclick="submitProblem()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">문제 등록 완료</button>
             </div>
         </div>
     </div>
@@ -110,7 +162,7 @@
         &copy; 2026 MATHISM. All rights reserved.
     </footer>
 
-    <!-- Supabase Integration Script -->
+    <!-- Supabase & App Script -->
     <script>
         const SUPABASE_URL = 'https://yappoknkcvifkvimesmk.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_cWfOvIPy8XWXGFgJACO2Tg_3bbL7Zhi';
@@ -124,7 +176,10 @@
 
         const modal = document.getElementById('authModal');
         const nicknameModal = document.getElementById('nicknameModal');
+        const problemModal = document.getElementById('problemModal');
         const authContainer = document.getElementById('authContainer');
+        const registerBtn = document.getElementById('registerBtn');
+        const registerBtnInList = document.getElementById('registerBtnInList');
 
         let currentUser = null;
 
@@ -142,7 +197,6 @@
         });
 
         function openAuthModal() {
-            // 이미 로그인된 상태면 로그인 모달 대신 안내
             if (currentUser) {
                 alert('이미 로그인되어 있습니다!');
                 return;
@@ -150,33 +204,34 @@
             modal.classList.remove('hidden');
         }
         function closeAuthModal() { modal.classList.add('hidden'); }
+        function openProblemModal() { problemModal.classList.remove('hidden'); }
+        function closeProblemModal() { problemModal.classList.add('hidden'); }
 
-        // 문제 풀기 시작하기 버튼 클릭 시 처리
-        function handleStartClick() {
-            if (!currentUser) {
-                openAuthModal();
-            } else {
-                alert('문제 은행 페이지로 이동합니다! (다음 단계에서 구현 예정)');
+        function showSection(section) {
+            const homeView = document.getElementById('homeView');
+            const problemsView = document.getElementById('problemsView');
+
+            if (section === 'home') {
+                homeView.classList.remove('hidden');
+                problemsView.classList.add('hidden');
+            } else if (section === 'problems') {
+                homeView.classList.add('hidden');
+                problemsView.classList.remove('hidden');
+                loadProblems();
             }
         }
 
         async function handleGoogleLogin() {
             if (!supabaseClient) { alert('Supabase 설정이 올바르지 않습니다.'); return; }
-            
             const { error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
-                options: {
-                    redirectTo: window.location.origin
-                }
+                options: { redirectTo: window.location.origin }
             });
-
-            if (error) {
-                alert('구글 로그인 실패: ' + error.message);
-            }
+            if (error) alert('구글 로그인 실패: ' + error.message);
         }
 
         async function checkAndRenderProfile(user) {
-            const { data, error } = await supabaseClient
+            const { data } = await supabaseClient
                 .from('profiles')
                 .select('nickname')
                 .eq('id', user.id)
@@ -192,7 +247,6 @@
         async function saveNickname() {
             if (!currentUser) return;
             const nickname = document.getElementById('nicknameInput').value.trim();
-
             if (!nickname || nickname.length < 2) {
                 alert('닉네임은 2글자 이상 입력해주세요.');
                 return;
@@ -204,9 +258,9 @@
 
             if (error) {
                 if (error.code === '23505') {
-                    alert('이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해 주세요.');
+                    alert('이미 사용 중인 닉네임입니다.');
                 } else {
-                    alert('닉네임 저장 실패: ' + error.message);
+                    alert('저장 실패: ' + error.message);
                 }
             } else {
                 nicknameModal.classList.add('hidden');
@@ -215,6 +269,8 @@
         }
 
         function renderLoggedInState(nickname) {
+            registerBtn.classList.remove('hidden');
+            registerBtnInList.classList.remove('hidden');
             authContainer.innerHTML = `
                 <div class="flex items-center space-x-4">
                     <span class="text-sm text-slate-300 font-semibold"><strong class="text-indigo-400">${nickname}</strong>님</span>
@@ -229,6 +285,126 @@
             if (!supabaseClient) return;
             await supabaseClient.auth.signOut();
             location.reload();
+        }
+
+        // 문제 등록 함수
+        async function submitProblem() {
+            if (!currentUser) { alert('로그인이 필요합니다.'); return; }
+            const content = document.getElementById('probContent').value.trim();
+            const imageUrl = document.getElementById('probImage').value.trim();
+            const answer = document.getElementById('probAnswer').value.trim();
+
+            if (!content || !answer) {
+                alert('문제 내용과 정답을 모두 입력해주세요.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('problems')
+                .insert({ content, image_url: imageUrl || null, answer });
+
+            if (error) {
+                alert('문제 등록 실패: ' + error.message);
+            } else {
+                alert('문제가 성공적으로 등록되었습니다!');
+                document.getElementById('probContent').value = '';
+                document.getElementById('probImage').value = '';
+                document.getElementById('probAnswer').value = '';
+                closeProblemModal();
+                loadProblems();
+            }
+        }
+
+        // 문제 불러오기
+        async function loadProblems() {
+            const listContainer = document.getElementById('problemList');
+            listContainer.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">문제를 불러오는 중...</div>`;
+
+            const { data, error } = await supabaseClient
+                .from('problems')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                listContainer.innerHTML = `<div class="text-center py-12 text-rose-500 text-sm">문제를 불러오지 못했습니다: ${error.message}</div>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">등록된 문제가 없습니다. 첫 번째 문제를 등록해 보세요!</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            data.forEach((prob, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl backdrop-blur space-y-4';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center text-xs text-indigo-400 font-bold">
+                        <span>PROBLEM #${data.length - index}</span>
+                        <span class="text-slate-500">${new Date(prob.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <p class="text-slate-200 text-base font-medium whitespace-pre-wrap">${escapeHtml(prob.content)}</p>
+                    ${prob.image_url ? `<div class="my-3"><img src="${escapeHtml(prob.image_url)}" alt="문제 이미지" class="max-h-64 rounded-lg border border-slate-800"></div>` : ''}
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-2">
+                        <input type="text" id="userAns_${prob.id}" placeholder="정답 입력 (예: 1/2 또는 0.5)" class="flex-grow bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <button onclick="verifyAnswer(${prob.id}, '${escapeQuote(prob.answer)}')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-6 py-2.5 rounded-lg transition">정답 제출</button>
+                    </div>
+                    <div id="result_${prob.id}" class="text-xs font-semibold"></div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        // 수학적 동치 판정 로직 (1/2 = 0.5 등 처리)
+        function parseMathValue(str) {
+            if (!str) return NaN;
+            str = str.toString().trim();
+            // 분수 형태 처리 (예: "1/2")
+            if (str.includes('/')) {
+                const parts = str.split('/');
+                if (parts.length === 2) {
+                    const num = parseFloat(parts[0]);
+                    const den = parseFloat(parts[1]);
+                    if (!isNaN(num) && !isNaN(den) && den !== 0) {
+                        return num / den;
+                    }
+                }
+            }
+            return parseFloat(str);
+        }
+
+        function verifyAnswer(probId, correctAns) {
+            const userAnsInput = document.getElementById(`userAns_${probId}`).value;
+            const resultDiv = document.getElementById(`result_${probId}`);
+
+            const uVal = parseMathValue(userAnsInput);
+            const cVal = parseMathValue(correctAnswerString = correctAns);
+
+            let isCorrect = false;
+            if (!isNaN(uVal) && !isNaN(cVal)) {
+                // 부동소수점 오차를 고려한 비교 (1e-6)
+                isCorrect = Math.abs(uVal - cVal) < 1e-6;
+            } else {
+                // 숫자가 아닐 경우 문자열 그대로 엄격 비교
+                isCorrect = userAnsInput.trim().toLowerCase() === correctAns.trim().toLowerCase();
+            }
+
+            if (isCorrect) {
+                resultDiv.className = 'text-xs font-bold text-emerald-400 mt-1';
+                resultDiv.textContent = '🎉 정답입니다!';
+            } else {
+                resultDiv.className = 'text-xs font-bold text-rose-400 mt-1';
+                resultDiv.textContent = '❌ 오답입니다. 다시 시도해 보세요!';
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function escapeQuote(str) {
+            return str.replace(/'/g, "\\'");
         }
     </script>
 </body>
