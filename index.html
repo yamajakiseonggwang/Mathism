@@ -30,7 +30,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v2.5</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v2.6</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        <!-- 2. Problems List View (통합 검색 지원) -->
+        <!-- 2. Problems List View -->
         <div id="problemsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -94,7 +94,6 @@
                 </div>
             </div>
 
-            <!-- 검색 결과 유저 목록 패널 (검색어 입력 시 표시) -->
             <div id="searchUserResultContainer" class="hidden mb-6 bg-slate-900/40 border border-indigo-500/30 p-4 rounded-xl">
                 <div class="text-xs font-bold text-indigo-400 mb-2">🔍 검색된 유저 프로필</div>
                 <div id="searchUserList" class="flex flex-wrap gap-2"></div>
@@ -179,7 +178,7 @@
             </div>
         </div>
 
-        <!-- 4. Problem Creation View (파일 업로드 지원) -->
+        <!-- 4. Problem Creation View -->
         <div id="createProblemView" class="w-full hidden">
             <div class="mb-6">
                 <button onclick="showSection('problems')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
@@ -242,78 +241,90 @@
                     <p class="text-xs text-slate-300 leading-relaxed">
                         문제 내용과 정답에 수학 기호를 자유롭게 입력할 수 있습니다.
                     </p>
-                    <div class="space-y-3 text-xs">
-                        <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl space-y-1">
-                            <div class="font-bold text-indigo-300">· 루트 (근호)</div>
-                            <div class="text-slate-400">입력: <code class="text-indigo-200">\sqrt{2}</code></div>
-                        </div>
-                        <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl space-y-1">
-                            <div class="font-bold text-indigo-300">· 분수</div>
-                            <div class="text-slate-400">입력: <code class="text-indigo-200">\frac{1}{2}</code></div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 5. My Page View (파일 업로드 지원 및 푼 문제 목록) -->
+        <!-- 5. My Page View (더 멋있고 프리미엄한 대형 디자인 리뉴얼) -->
         <div id="myPageView" class="w-full hidden">
-            <div class="mb-6">
-                <button onclick="showSection('rankings')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
+            <div class="mb-6 flex justify-between items-center">
+                <button onclick="showSection('rankings')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1">
                     <span>← 랭킹 보드로 돌아가기</span>
                 </button>
-                <h2 id="myPageTitle" class="text-2xl font-black text-white">마이페이지</h2>
-                <p id="myPageSubTitle" class="text-xs text-slate-400 mt-1">프로필 정보와 획득 점수 및 전체 순위를 확인하세요.</p>
             </div>
 
-            <div class="space-y-8 max-w-2xl mx-auto">
-                <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
-                    <div class="flex flex-col items-center space-y-4">
-                        <div class="relative">
-                            <img id="myPageAvatarPreview" src="https://via.placeholder.com/150" alt="프로필 사진" class="w-24 h-24 rounded-full object-cover border-2 border-indigo-500/50 shadow-lg">
+            <div class="space-y-6 max-w-3xl mx-auto">
+                <!-- 프로필 대형 프리미엄 카드 -->
+                <div class="relative bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-950/40 border border-indigo-500/30 p-8 md:p-10 rounded-3xl shadow-2xl backdrop-blur overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                        <div class="relative group">
+                            <img id="myPageAvatarPreview" src="https://via.placeholder.com/150" alt="프로필 사진" class="w-28 h-28 md:w-32 md:h-32 rounded-2xl object-cover border-2 border-indigo-500/60 shadow-xl shadow-indigo-500/10">
                         </div>
-                        <div class="text-center space-y-3">
-                            <h3 id="profileViewNickname" class="text-xl font-bold text-white">유저 닉네임</h3>
-                            <div class="flex flex-wrap justify-center gap-2">
-                                <span id="myPageTierBadge" class="px-3 py-1 rounded-full bg-slate-800 text-slate-200 text-xs font-bold border border-slate-700">⚙️ 로딩중...</span>
-                                <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">⭐ 점수: <span id="myPageScoreText">0</span>점</span>
-                                <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">🏆 순위: <span id="myPageRankText">-</span></span>
-                                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">🎯 정답률: <span id="myPageAccuracyText">0%</span></span>
+                        <div class="flex-grow text-center md:text-left space-y-3">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                <h2 id="profileViewNickname" class="text-2xl md:text-3xl font-black text-white tracking-tight">유저 닉네임</h2>
+                                <span id="myPageTierBadge" class="px-4 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-300 text-xs font-black border border-indigo-500/30 w-fit mx-auto md:mx-0">⚙️ 로딩중...</span>
+                            </div>
+                            
+                            <p id="myPageSubTitle" class="text-xs text-slate-400 leading-relaxed">MATHISM 아카이브에서 엄밀한 수학적 사고를 증명하고 있는 학습자입니다.</p>
+
+                            <!-- 통계 뱃지 그리드 -->
+                            <div class="grid grid-cols-3 gap-3 pt-2">
+                                <div class="bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl text-center">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">누적 점수</div>
+                                    <div class="text-base font-black text-indigo-400"><span id="myPageScoreText">0</span>점</div>
+                                </div>
+                                <div class="bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl text-center">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">전체 순위</div>
+                                    <div class="text-base font-black text-amber-400" id="myPageRankText">-</div>
+                                </div>
+                                <div class="bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl text-center">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">정답률</div>
+                                    <div class="text-base font-black text-emerald-400" id="myPageAccuracyText">0%</div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 프로필 수정 (파일 업로드 지원) -->
-                    <div id="myPageEditSection" class="space-y-4 pt-4 border-t border-slate-800 hidden">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-2">닉네임 변경</label>
-                            <input type="text" id="myPageNicknameInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-2">프로필 사진 파일 업로드</label>
-                            <input type="file" id="myPageAvatarFile" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+                    <!-- 본인일 때만 수정 가능하도록 표시되는 편집 섹션 -->
+                    <div id="myPageEditSection" class="space-y-4 pt-6 mt-6 border-t border-slate-800/80 hidden">
+                        <div class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">⚙️ 프로필 설정 관리</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-2">닉네임 변경</label>
+                                <input type="text" id="myPageNicknameInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-2">프로필 사진 파일 업로드</label>
+                                <input type="file" id="myPageAvatarFile" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+                            </div>
                         </div>
                         <button onclick="updateProfile()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-indigo-600/30">프로필 정보 수정 저장</button>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl backdrop-blur space-y-4">
-                    <h3 class="text-sm font-bold text-slate-300 flex items-center space-x-2">
-                        <span>📚 해결한 문제 목록</span>
-                    </h3>
-                    <div id="solvedProblemsList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
-                        <p class="text-xs text-slate-500 text-center py-6">해결한 문제를 불러오는 중...</p>
+                <!-- 푼 문제 목록 카드 -->
+                <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-3xl backdrop-blur space-y-4 shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-black text-white flex items-center space-x-2">
+                            <span>📚 해결한 문제 아카이브</span>
+                        </h3>
+                    </div>
+                    <div id="solvedProblemsList" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                        <p class="text-xs text-slate-500 text-center py-8">해결한 문제를 불러오는 중...</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 6. Rankings View -->
+        <!-- 6. Rankings View (프로필 사진 포함) -->
         <div id="rankingsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
                     <h2 class="text-2xl font-black text-white">랭킹 보드</h2>
-                    <p class="text-xs text-slate-400 mt-1">유저의 닉네임을 클릭하면 해당 유저의 프로필을 방문할 수 있습니다.</p>
+                    <p class="text-xs text-slate-400 mt-1">유저의 프로필 사진이나 닉네임을 클릭하면 해당 유저의 프로필을 방문할 수 있습니다.</p>
                 </div>
                 <button onclick="showSection('home')" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs px-4 py-2.5 rounded-lg border border-slate-800 transition">
                     홈으로
@@ -325,7 +336,7 @@
                     <thead>
                         <tr class="border-b border-slate-800 bg-slate-950/60 text-xs font-bold text-slate-400">
                             <th class="py-4 px-6 w-28 text-center">순위</th>
-                            <th class="py-4 px-6">닉네임 (클릭시 프로필 방문)</th>
+                            <th class="py-4 px-6">유저 정보 (프로필 / 닉네임)</th>
                             <th class="py-4 px-6 text-center">티어</th>
                             <th class="py-4 px-6 text-right">누적 점수</th>
                         </tr>
@@ -339,7 +350,7 @@
             </div>
         </div>
 
-        <!-- 7. Tiers System Guide View (티어 점수대 안내) -->
+        <!-- 7. Tiers System Guide View -->
         <div id="tiersView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -697,25 +708,25 @@
             const accuracy = totalProblemCount && totalProblemCount > 0 
                 ? Math.round((solvedCount / totalProblemCount) * 100) 
                 : 0;
-            accuracyEl.textContent = `${accuracy}% (${solvedCount}문제 해결)`;
+            accuracyEl.textContent = `${accuracy}% (${solvedCount}문제)`;
 
             if (!solvesData || solvesData.length === 0) {
-                solvedListContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">아직 해결한 문제가 없습니다.</p>`;
+                solvedListContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">아직 해결한 문제가 없습니다.</p>`;
             } else {
                 solvedListContainer.innerHTML = '';
                 solvesData.forEach(item => {
                     const p = item.problems;
                     if (!p) return;
                     const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-indigo-500/40 transition cursor-pointer';
+                    div.className = 'flex items-center justify-between p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-indigo-500/40 transition cursor-pointer';
                     div.onclick = () => showSection('detail', p);
                     div.innerHTML = `
                         <div class="flex items-center space-x-3">
-                            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">#${p.id}</span>
+                            <span class="text-xs px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">#${p.id}</span>
                             <span class="text-sm font-semibold text-slate-200">${escapeHtml(p.title)}</span>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">🔥 ${p.difficulty}점</span>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xs px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">🔥 ${p.difficulty}점</span>
                             <span class="text-xs text-slate-500">${new Date(item.solved_at).toLocaleDateString()}</span>
                         </div>
                     `;
@@ -724,23 +735,21 @@
             }
 
             const editSection = document.getElementById('myPageEditSection');
-            const pageTitle = document.getElementById('myPageTitle');
             const pageSub = document.getElementById('myPageSubTitle');
 
             if (isMe) {
-                pageTitle.textContent = '내 마이페이지';
-                pageSub.textContent = '프로필 정보를 수정하고 획득 점수와 순위를 확인하세요.';
+                pageSub.textContent = 'MATHISM 아카이브에서 나의 학습 기록을 관리하고 프로필을 편집하세요.';
                 document.getElementById('myPageNicknameInput').value = targetProfile.nickname || '';
                 editSection.classList.remove('hidden');
             } else {
-                pageTitle.textContent = `${targetProfile.nickname}님의 프로필`;
-                pageSub.textContent = 'MATHISM 아카이브에서 활동 중인 유저의 정보입니다.';
+                pageSub.textContent = `MATHISM 아카이브에서 활동 중인 ${targetProfile.nickname}님의 학습 프로필입니다.`;
                 editSection.classList.add('hidden');
             }
 
             document.getElementById('myPageView').classList.remove('hidden');
         }
 
+        // 랭킹 보드 렌더링 (아바타 포함)
         async function loadRankingsBoard() {
             const tbody = document.getElementById('rankingTableBody');
             tbody.innerHTML = `<tr><td colspan="4" class="text-center py-12 text-slate-500">랭킹을 불러오는 중...</td></tr>`;
@@ -770,11 +779,21 @@
                 else if (rankNum === 2) rankBadgeColor = 'text-slate-300 font-bold';
                 else if (rankNum === 3) rankBadgeColor = 'text-amber-600 font-bold';
 
+                const avatarHtml = p.avatar_url 
+                    ? `<img src="${escapeHtml(p.avatar_url)}" class="w-9 h-9 rounded-full object-cover border border-indigo-500/50 shadow">`
+                    : `<div class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shadow">${(p.nickname || '유').charAt(0)}</div>`;
+
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/40 transition';
+                tr.className = 'hover:bg-slate-800/40 transition cursor-pointer';
+                tr.onclick = () => viewUserProfile(p.id);
                 tr.innerHTML = `
                     <td class="py-4 px-6 text-center ${rankBadgeColor}">${rankNum <= 3 ? '🏆 ' : ''}${rankNum}위</td>
-                    <td class="py-4 px-6 font-semibold text-indigo-400 hover:text-indigo-300 cursor-pointer underline decoration-indigo-500/30" onclick="viewUserProfile('${p.id}')">${escapeHtml(p.nickname || '익명')}</td>
+                    <td class="py-4 px-6">
+                        <div class="flex items-center space-x-3">
+                            ${avatarHtml}
+                            <span class="font-semibold text-indigo-400 hover:text-indigo-300">${escapeHtml(p.nickname || '익명')}</span>
+                        </div>
+                    </td>
                     <td class="py-4 px-6 text-center"><span class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 font-bold whitespace-nowrap">${tier}</span></td>
                     <td class="py-4 px-6 text-right font-mono font-bold text-amber-400">${p.score || 0}점</td>
                 `;
@@ -838,7 +857,6 @@
             location.reload();
         }
 
-        // 문제 등록 시 파일 업로드 처리
         async function submitNewProblem() {
             if (!currentUser) { alert('로그인이 필요합니다.'); return; }
             const category = document.getElementById('createCategory').value;
@@ -953,11 +971,9 @@
             });
         }
 
-        // 통합 검색 기능 (문제 및 유저 검색)
         function filterProblemsAndUsers() {
             const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
             
-            // 1. 문제 필터링
             const filteredProblems = allProblemsCache.filter(prob => 
                 prob.title.toLowerCase().includes(keyword) || 
                 prob.content.toLowerCase().includes(keyword) ||
@@ -965,7 +981,6 @@
             );
             renderTableRows(filteredProblems);
 
-            // 2. 유저 필터링 및 칩 표시
             const userResultContainer = document.getElementById('searchUserResultContainer');
             const userListEl = document.getElementById('searchUserList');
 
