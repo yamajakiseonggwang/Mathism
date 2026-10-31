@@ -30,7 +30,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v2.4</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v2.5</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -76,15 +76,15 @@
             </div>
         </div>
 
-        <!-- 2. Problems List View -->
+        <!-- 2. Problems List View (통합 검색 지원) -->
         <div id="problemsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-2xl font-black text-white">문제 은행</h2>
-                    <p class="text-xs text-slate-400 mt-1">목록에서 문제를 클릭하여 상세 내용을 확인하고 풀이할 수 있습니다. (완료된 문제는 체크 표시)</p>
+                    <h2 class="text-2xl font-black text-white">문제 은행 & 검색</h2>
+                    <p class="text-xs text-slate-400 mt-1">문제 제목, 내용 뿐만 아니라 유저 닉네임으로도 검색이 가능합니다.</p>
                 </div>
                 <div class="flex items-center space-x-3 w-full md:w-auto">
-                    <input type="text" id="searchInput" oninput="filterProblemTable()" placeholder="문제 제목 검색..." class="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 w-full md:w-48">
+                    <input type="text" id="searchInput" oninput="filterProblemsAndUsers()" placeholder="문제 또는 유저 검색..." class="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 w-full md:w-60">
                     <button onclick="showSection('create')" id="registerBtnInList" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition whitespace-nowrap">
                         + 문제 등록
                     </button>
@@ -92,6 +92,12 @@
                         홈으로
                     </button>
                 </div>
+            </div>
+
+            <!-- 검색 결과 유저 목록 패널 (검색어 입력 시 표시) -->
+            <div id="searchUserResultContainer" class="hidden mb-6 bg-slate-900/40 border border-indigo-500/30 p-4 rounded-xl">
+                <div class="text-xs font-bold text-indigo-400 mb-2">🔍 검색된 유저 프로필</div>
+                <div id="searchUserList" class="flex flex-wrap gap-2"></div>
             </div>
 
             <div class="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur mb-8">
@@ -173,7 +179,7 @@
             </div>
         </div>
 
-        <!-- 4. Problem Creation View -->
+        <!-- 4. Problem Creation View (파일 업로드 지원) -->
         <div id="createProblemView" class="w-full hidden">
             <div class="mb-6">
                 <button onclick="showSection('problems')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
@@ -215,8 +221,8 @@
                         <textarea id="createContent" rows="6" placeholder="예: 방정식 $x^2 - 2 = 0$의 양의 근을 구하시오." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-2">이미지 주소 (URL - 선택사항)</label>
-                        <input type="text" id="createImage" placeholder="https://example.com/image.png" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <label class="block text-xs font-bold text-slate-400 mb-2">문제 이미지 첨부 (선택사항)</label>
+                        <input type="file" id="createImageFile" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2">정답 (예: \sqrt{2} 또는 \frac{1}{2} 또는 0.5)</label>
@@ -250,7 +256,7 @@
             </div>
         </div>
 
-        <!-- 5. My Page View (내 프로필 및 타인 프로필 + 푼 문제 목록 & 정답률) -->
+        <!-- 5. My Page View (파일 업로드 지원 및 푼 문제 목록) -->
         <div id="myPageView" class="w-full hidden">
             <div class="mb-6">
                 <button onclick="showSection('rankings')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
@@ -261,7 +267,6 @@
             </div>
 
             <div class="space-y-8 max-w-2xl mx-auto">
-                <!-- 프로필 카드 -->
                 <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
                     <div class="flex flex-col items-center space-y-4">
                         <div class="relative">
@@ -278,21 +283,20 @@
                         </div>
                     </div>
 
-                    <!-- 본인일 때만 수정 가능하도록 표시되는 영역 -->
+                    <!-- 프로필 수정 (파일 업로드 지원) -->
                     <div id="myPageEditSection" class="space-y-4 pt-4 border-t border-slate-800 hidden">
                         <div>
                             <label class="block text-xs font-bold text-slate-400 mb-2">닉네임 변경</label>
                             <input type="text" id="myPageNicknameInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-2">프로필 사진 주소 (이미지 URL)</label>
-                            <input type="text" id="myPageAvatarInput" placeholder="https://example.com/profile.png" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <label class="block text-xs font-bold text-slate-400 mb-2">프로필 사진 파일 업로드</label>
+                            <input type="file" id="myPageAvatarFile" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
                         </div>
                         <button onclick="updateProfile()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-indigo-600/30">프로필 정보 수정 저장</button>
                     </div>
                 </div>
 
-                <!-- 푼 문제 목록 섹션 -->
                 <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl backdrop-blur space-y-4">
                     <h3 class="text-sm font-bold text-slate-300 flex items-center space-x-2">
                         <span>📚 해결한 문제 목록</span>
@@ -304,7 +308,7 @@
             </div>
         </div>
 
-        <!-- 6. Rankings View (랭킹 보드) -->
+        <!-- 6. Rankings View -->
         <div id="rankingsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -332,6 +336,60 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- 7. Tiers System Guide View (티어 점수대 안내) -->
+        <div id="tiersView" class="w-full hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-white">티어 시스템 안내</h2>
+                    <p class="text-xs text-slate-400 mt-1">누적 점수 및 랭킹 조건에 따른 티어 체계입니다.</p>
+                </div>
+                <button onclick="showSection('home')" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs px-4 py-2.5 rounded-lg border border-slate-800 transition">
+                    홈으로
+                </button>
+            </div>
+
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 backdrop-blur space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-amber-400">🪨 아이언</div>
+                        <div class="text-xs text-slate-400">점수 조건: 0점 ~ 49점</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-amber-400">🥉 실버</div>
+                        <div class="text-xs text-slate-400">점수 조건: 50점 ~ 99점</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-amber-400">🥈 골드</div>
+                        <div class="text-xs text-slate-400">점수 조건: 100점 ~ 149점</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-amber-400">🥇 플래티넘</div>
+                        <div class="text-xs text-slate-400">점수 조건: 150점 ~ 199점</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-amber-400">🟢 에메랄드</div>
+                        <div class="text-xs text-slate-400">점수 조건: 350점 ~ 399점</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-amber-400">💠 다이아몬드</div>
+                        <div class="text-xs text-slate-400">점수 조건: 400점 ~ 449점</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-indigo-400">👑 마스터</div>
+                        <div class="text-xs text-slate-400">점수 조건: 450점 이상 (TOP 101위 이하)</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div class="font-bold text-indigo-400">💎 그랜드마스터</div>
+                        <div class="text-xs text-slate-400">점수 조건: 450점 이상 + 전체 랭킹 31위 ~ 100위</div>
+                    </div>
+                </div>
+                <div class="p-5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 space-y-1 text-center">
+                    <div class="font-black text-indigo-300 text-sm">🏆 최상위 티어: 챌린저</div>
+                    <div class="text-xs text-slate-300">450점 이상 달성자 중 <strong>전체 랭킹 1위 ~ 30위</strong>에게 부여됩니다.</div>
+                </div>
             </div>
         </div>
 
@@ -406,8 +464,9 @@
         let currentProblemUserId = null;
         let currentProblemIsFixed = false;
         let allProblemsCache = []; 
+        let allProfilesCache = [];
         let userProfileCache = null;
-        let userSolvedProblemIds = new Set(); // 내가 푼 문제 ID 저장 세트
+        let userSolvedProblemIds = new Set();
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!supabaseClient) return;
@@ -452,6 +511,7 @@
             document.getElementById('createProblemView').classList.add('hidden');
             document.getElementById('myPageView').classList.add('hidden');
             document.getElementById('rankingsView').classList.add('hidden');
+            document.getElementById('tiersView').classList.add('hidden');
 
             if (section === 'home') {
                 document.getElementById('homeView').classList.remove('hidden');
@@ -479,6 +539,8 @@
             } else if (section === 'rankings') {
                 document.getElementById('rankingsView').classList.remove('hidden');
                 await loadRankingsBoard();
+            } else if (section === 'tiers') {
+                document.getElementById('tiersView').classList.remove('hidden');
             }
         }
 
@@ -593,7 +655,6 @@
             `;
         }
 
-        // 마이페이지 렌더링 (푼 문제 목록 및 정답률 포함)
         async function renderMyPage(targetUserId) {
             const { data: targetProfile, error } = await supabaseClient
                 .from('profiles')
@@ -619,7 +680,6 @@
             const preview = document.getElementById('myPageAvatarPreview');
             preview.src = targetProfile.avatar_url || 'https://via.placeholder.com/150';
 
-            // 해당 유저가 푼 문제 목록 조회
             const { data: solvesData } = await supabaseClient
                 .from('problem_solves')
                 .select('problem_id, solved_at, problems(id, title, category, difficulty)')
@@ -629,7 +689,6 @@
             const solvedListContainer = document.getElementById('solvedProblemsList');
             const accuracyEl = document.getElementById('myPageAccuracyText');
 
-            // 전체 문제 수 대비 정답률 계산
             const { count: totalProblemCount } = await supabaseClient
                 .from('problems')
                 .select('*', { count: 'exact', head: true });
@@ -672,7 +731,6 @@
                 pageTitle.textContent = '내 마이페이지';
                 pageSub.textContent = '프로필 정보를 수정하고 획득 점수와 순위를 확인하세요.';
                 document.getElementById('myPageNicknameInput').value = targetProfile.nickname || '';
-                document.getElementById('myPageAvatarInput').value = targetProfile.avatar_url || '';
                 editSection.classList.remove('hidden');
             } else {
                 pageTitle.textContent = `${targetProfile.nickname}님의 프로필`;
@@ -732,16 +790,37 @@
         async function updateProfile() {
             if (!currentUser) return;
             const nickname = document.getElementById('myPageNicknameInput').value.trim();
-            const avatarUrl = document.getElementById('myPageAvatarInput').value.trim();
+            const avatarFile = document.getElementById('myPageAvatarFile').files[0];
 
             if (!nickname || nickname.length < 2) {
                 alert('닉네임은 2글자 이상 입력해주세요.');
                 return;
             }
 
+            let avatarUrl = userProfileCache.avatar_url;
+
+            if (avatarFile) {
+                const fileExt = avatarFile.name.split('.').pop();
+                const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
+                const { error: uploadError } = await supabaseClient.storage
+                    .from('mathism-uploads')
+                    .upload(`avatars/${fileName}`, avatarFile);
+
+                if (uploadError) {
+                    alert('프로필 이미지 업로드 실패: ' + uploadError.message);
+                    return;
+                }
+
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('mathism-uploads')
+                    .getPublicUrl(`avatars/${fileName}`);
+                
+                avatarUrl = publicUrlData.publicUrl;
+            }
+
             const { error } = await supabaseClient
                 .from('profiles')
-                .update({ nickname: nickname, avatar_url: avatarUrl || null })
+                .update({ nickname: nickname, avatar_url: avatarUrl })
                 .eq('id', currentUser.id);
 
             if (error) {
@@ -759,18 +838,39 @@
             location.reload();
         }
 
+        // 문제 등록 시 파일 업로드 처리
         async function submitNewProblem() {
             if (!currentUser) { alert('로그인이 필요합니다.'); return; }
             const category = document.getElementById('createCategory').value;
             const difficulty = parseInt(document.getElementById('createDifficulty').value);
             const title = document.getElementById('createTitle').value.trim();
             const content = document.getElementById('createContent').value.trim();
-            const imageUrl = document.getElementById('createImage').value.trim();
+            const imageFile = document.getElementById('createImageFile').files[0];
             const answer = document.getElementById('createAnswer').value.trim();
 
             if (!title || !content || !answer) {
                 alert('제목, 문제 내용, 정답은 필수 입력 항목입니다.');
                 return;
+            }
+
+            let imageUrl = null;
+            if (imageFile) {
+                const fileExt = imageFile.name.split('.').pop();
+                const fileName = `problem-${Math.random()}.${fileExt}`;
+                const { error: uploadError } = await supabaseClient.storage
+                    .from('mathism-uploads')
+                    .upload(`problems/${fileName}`, imageFile);
+
+                if (uploadError) {
+                    alert('이미지 업로드 실패: ' + uploadError.message);
+                    return;
+                }
+
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('mathism-uploads')
+                    .getPublicUrl(`problems/${fileName}`);
+                
+                imageUrl = publicUrlData.publicUrl;
             }
 
             const isDev = currentUser.email === DEVELOPER_EMAIL;
@@ -782,7 +882,7 @@
                     difficulty, 
                     title, 
                     content, 
-                    image_url: imageUrl || null, 
+                    image_url: imageUrl, 
                     answer, 
                     user_id: currentUser.id,
                     is_fixed: isDev 
@@ -794,8 +894,8 @@
                 alert('문제가 성공적으로 등록되었습니다!');
                 document.getElementById('createTitle').value = '';
                 document.getElementById('createContent').value = '';
-                document.getElementById('createImage').value = '';
                 document.getElementById('createAnswer').value = '';
+                document.getElementById('createImageFile').value = '';
                 showSection('problems');
             }
         }
@@ -810,12 +910,17 @@
                 .select('*')
                 .order('id', { ascending: true });
 
+            const { data: profilesData } = await supabaseClient
+                .from('profiles')
+                .select('*');
+
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">문제를 불러오지 못했습니다: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">문제를 불러오지 못했습니다.</td></tr>`;
                 return;
             }
 
             allProblemsCache = data || [];
+            allProfilesCache = profilesData || [];
             renderTableRows(allProblemsCache);
         }
 
@@ -848,14 +953,41 @@
             });
         }
 
-        function filterProblemTable() {
+        // 통합 검색 기능 (문제 및 유저 검색)
+        function filterProblemsAndUsers() {
             const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-            const filtered = allProblemsCache.filter(prob => 
+            
+            // 1. 문제 필터링
+            const filteredProblems = allProblemsCache.filter(prob => 
                 prob.title.toLowerCase().includes(keyword) || 
                 prob.content.toLowerCase().includes(keyword) ||
                 (prob.category && prob.category.toLowerCase().includes(keyword))
             );
-            renderTableRows(filtered);
+            renderTableRows(filteredProblems);
+
+            // 2. 유저 필터링 및 칩 표시
+            const userResultContainer = document.getElementById('searchUserResultContainer');
+            const userListEl = document.getElementById('searchUserList');
+
+            if (!keyword) {
+                userResultContainer.classList.add('hidden');
+                return;
+            }
+
+            const matchedUsers = allProfilesCache.filter(p => p.nickname && p.nickname.toLowerCase().includes(keyword));
+            if (matchedUsers.length > 0) {
+                userListEl.innerHTML = '';
+                matchedUsers.forEach(u => {
+                    const btn = document.createElement('button');
+                    btn.className = 'px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-indigo-500 text-xs font-bold text-indigo-300 transition flex items-center space-x-1';
+                    btn.onclick = () => viewUserProfile(u.id);
+                    btn.textContent = `👤 ${u.nickname} (${u.score || 0}점)`;
+                    userListEl.appendChild(btn);
+                });
+                userResultContainer.classList.remove('hidden');
+            } else {
+                userResultContainer.classList.add('hidden');
+            }
         }
 
         async function renderProblemDetail(prob) {
