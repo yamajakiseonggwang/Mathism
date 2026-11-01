@@ -30,7 +30,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.2</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.3</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -697,7 +697,7 @@
                 await renderProblemDetail(dataObj);
             } else if (section === 'community') {
                 document.getElementById('communityView').classList.remove('hidden');
-                await loadCommunityPosts();
+                loadCommunityPosts();
             } else if (section === 'postDetail' && dataObj) {
                 document.getElementById('postDetailView').classList.remove('hidden');
                 renderPostDetail(dataObj);
@@ -1053,32 +1053,49 @@
             location.reload();
         }
 
-        // --- 자유게시판 로직 ---
-        async function loadCommunityPosts() {
-            const tbody = document.getElementById('postsTableBody');
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">게시글을 불러오는 중...</td></tr>`;
-
-            const { data, error } = await supabaseClient
-                .from('community_posts')
-                .select('*, profiles(nickname)')
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">게시글을 불러오지 못했습니다.</td></tr>`;
-                return;
+        // --- 자유게시판 로직 (localStorage 기반 완전 독립형) ---
+        function getStoredPosts() {
+            const raw = localStorage.getItem('mathism_community_posts');
+            if (!raw) {
+                const defaultPosts = [
+                    {
+                        id: 1,
+                        user_id: 'system',
+                        nickname: '관리자',
+                        title: 'MATHISM 자유게시판 오픈 안내',
+                        content: '유저들끼리 자유롭게 수학 잡담을 나누고 소통할 수 있는 공간입니다!',
+                        is_notice: true,
+                        created_at: new Date().toISOString()
+                    }
+                ];
+                localStorage.setItem('mathism_community_posts', JSON.stringify(defaultPosts));
+                return defaultPosts;
             }
+            try { return JSON.parse(raw); } catch(e) { return []; }
+        }
 
-            if (!data || data.length === 0) {
+        function saveStoredPosts(posts) {
+            localStorage.setItem('mathism_community_posts', JSON.stringify(posts));
+        }
+
+        function loadCommunityPosts() {
+            const tbody = document.getElementById('postsTableBody');
+            const posts = getStoredPosts();
+
+            if (posts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">등록된 글이 없습니다. 첫 글을 작성해 보세요!</td></tr>`;
                 return;
             }
 
+            // 최신순 정렬
+            posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
             tbody.innerHTML = '';
-            data.forEach(post => {
+            posts.forEach(post => {
                 const isNotice = post.is_notice;
-                const authorNick = post.profiles ? post.profiles.nickname : '익명';
+                const authorNick = post.nickname || '익명';
                 const isDev = currentUser && currentUser.email === DEVELOPER_EMAIL;
-                const isAuthor = currentUser && currentUser.id === post.user_id;
+                const isAuthor = currentUser && currentUser.user_id && currentUser.id === post.user_id;
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-800/40 transition cursor-pointer';
@@ -1102,7 +1119,7 @@
             });
         }
 
-        async function submitCommunityPost() {
+        function submitCommunityPost() {
             if (!currentUser) { alert('로그인이 필요합니다.'); return; }
             const title = document.getElementById('postTitleInput').value.trim();
             const content = document.getElementById('postContentInput').value.trim();
@@ -1113,40 +1130,37 @@
             }
 
             const isDev = currentUser.email === DEVELOPER_EMAIL;
+            const nickname = userProfileCache ? userProfileCache.nickname : '익명 유저';
 
-            const { error } = await supabaseClient
-                .from('community_posts')
-                .insert({
-                    title,
-                    content,
-                    user_id: currentUser.id,
-                    is_notice: isDev 
-                });
+            const posts = getStoredPosts();
+            const newPost = {
+                id: Date.now(),
+                user_id: currentUser.id,
+                nickname: nickname,
+                title: title,
+                content: content,
+                is_notice: isDev,
+                created_at: new Date().toISOString()
+            };
 
-            if (error) {
-                alert('글 등록 실패: ' + error.message);
-            } else {
-                document.getElementById('postTitleInput').value = '';
-                document.getElementById('postContentInput').value = '';
-                closePostModal();
-                await loadCommunityPosts();
-            }
+            posts.push(newPost);
+            saveStoredPosts(posts);
+
+            document.getElementById('postTitleInput').value = '';
+            document.getElementById('postContentInput').value = '';
+            closePostModal();
+            loadCommunityPosts();
         }
 
-        async function deletePost(postId) {
+        function deletePost(postId) {
             if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
 
-            const { error } = await supabaseClient
-                .from('community_posts')
-                .delete()
-                .eq('id', postId);
+            let posts = getStoredPosts();
+            posts = posts.filter(p => p.id !== postId);
+            saveStoredPosts(posts);
 
-            if (error) {
-                alert('게시글 삭제 실패: ' + error.message);
-            } else {
-                alert('게시글이 삭제되었습니다.');
-                await loadCommunityPosts();
-            }
+            alert('게시글이 삭제되었습니다.');
+            loadCommunityPosts();
         }
 
         function renderPostDetail(post) {
@@ -1156,7 +1170,7 @@
                 : '<span class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 text-xs font-bold">자유게시판</span>';
 
             document.getElementById('postDetailTitle').textContent = post.title;
-            document.getElementById('postDetailAuthor').textContent = `작성자: ${post.profiles ? post.profiles.nickname : '익명'}`;
+            document.getElementById('postDetailAuthor').textContent = `작성자: ${post.nickname || '익명'}`;
             document.getElementById('postDetailDate').textContent = `작성일: ${new Date(post.created_at).toLocaleString()}`;
             document.getElementById('postDetailContent').textContent = post.content;
         }
