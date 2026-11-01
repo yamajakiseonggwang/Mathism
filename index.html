@@ -30,10 +30,11 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.0</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.1</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
+            <a href="#" onclick="showSection('community')" class="hover:text-indigo-400 transition">자유게시판</a>
             <a href="#" onclick="showSection('rankings')" class="hover:text-indigo-400 transition">랭킹 보드</a>
             <a href="#" onclick="showSection('tiers')" class="hover:text-indigo-400 transition">티어 시스템</a>
         </nav>
@@ -138,7 +139,7 @@
             </div>
         </div>
 
-        <!-- 3. Problem Detail View (정올 스타일 탭 UI 적용) -->
+        <!-- 3. Problem Detail View -->
         <div id="problemDetailView" class="w-full hidden">
             <div class="mb-6">
                 <button onclick="showSection('problems')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
@@ -193,21 +194,21 @@
                 </div>
             </div>
 
-            <!-- Tab 2: 풀이 토론 탭 (맞힌 유저만 참여 가능) -->
+            <!-- Tab 2: 풀이 토론 탭 (한국어 설명 및 깔끔한 정리) -->
             <div id="tabContentEditorial" class="hidden bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-lg font-black text-white">💬 풀이 토론 및 아이디어 공유 (Editorial)</h3>
-                        <p class="text-xs text-slate-400 mt-1">이 문제를 해결한 학습자만 참여하여 접근법과 수식을 공유할 수 있습니다.</p>
+                        <h3 class="text-lg font-black text-white">💬 풀이 토론 및 아이디어 공유</h3>
+                        <p class="text-xs text-slate-400 mt-1">이 문제를 해결한 학습자만 참여하여 자신만의 풀이법을 공유할 수 있습니다.</p>
                     </div>
                 </div>
 
                 <div id="editorialLockedMsg" class="hidden p-6 rounded-xl bg-slate-950 border border-slate-800 text-center text-xs text-amber-400 font-semibold">
-                    🔒 풀이 토론 탭은 **문제를 정답으로 맞힌 유저**에게만 열립니다. 문제를 먼저 해결해 보세요!
+                    🔒 풀이 토론은 **문제를 정답으로 맞힌 유저**에게만 열립니다. 문제를 먼저 해결해 보세요!
                 </div>
 
                 <div id="editorialFormBox" class="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
-                    <textarea id="editorialInput" rows="3" placeholder="자신만의 접근법, 수식 유도 과정, 보조선 활용법을 LaTeX 수식과 함께 공유해보세요..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+                    <textarea id="editorialInput" rows="3" placeholder="자신만의 접근법이나 풀이 과정을 자유롭게 적어보세요..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
                     <div class="flex justify-end">
                         <button onclick="submitEditorial()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-5 py-2 rounded-lg transition shadow">풀이 공유하기</button>
                     </div>
@@ -239,7 +240,64 @@
             </div>
         </div>
 
-        <!-- 4. Problem Creation View -->
+        <!-- 4. Community / Free Board View (자유게시판 및 공지사항) -->
+        <div id="communityView" class="w-full hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-white">자유게시판 & 공지사항</h2>
+                    <p class="text-xs text-slate-400 mt-1">유저들과 자유롭게 소통하고 최신 소식을 확인하세요.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openPostModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition whitespace-nowrap">
+                        + 글쓰기
+                    </button>
+                    <button onclick="showSection('home')" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs px-4 py-2.5 rounded-lg border border-slate-800 transition whitespace-nowrap">
+                        홈으로
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur mb-8">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-950/60 text-xs font-bold text-slate-400">
+                            <th class="py-4 px-6 w-24 text-center">구분</th>
+                            <th class="py-4 px-6">제목</th>
+                            <th class="py-4 px-6 w-40 text-center">작성자</th>
+                            <th class="py-4 px-6 w-36 text-center">작성일</th>
+                            <th class="py-4 px-6 w-24 text-center">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="postsTableBody" class="divide-y divide-slate-800/60 text-sm text-slate-300">
+                        <tr>
+                            <td colspan="5" class="text-center py-12 text-slate-500">게시글을 불러오는 중...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. Community Post Detail View -->
+        <div id="postDetailView" class="w-full hidden">
+            <div class="mb-6">
+                <button onclick="showSection('community')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
+                    <span>← 자유게시판으로 돌아가기</span>
+                </button>
+                <div class="flex items-center space-x-2 mb-2" id="postDetailBadgeContainer"></div>
+                <h2 id="postDetailTitle" class="text-2xl font-black text-white">글 제목</h2>
+                <div class="flex items-center space-x-4 text-xs text-slate-400 mt-2">
+                    <span id="postDetailAuthor">작성자</span>
+                    <span>•</span>
+                    <span id="postDetailDate">작성일</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
+                <div id="postDetailContent" class="text-slate-200 text-base font-medium whitespace-pre-wrap leading-relaxed"></div>
+            </div>
+        </div>
+
+        <!-- 6. Problem Creation View -->
         <div id="createProblemView" class="w-full hidden">
             <div class="mb-6">
                 <button onclick="showSection('problems')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
@@ -306,7 +364,7 @@
             </div>
         </div>
 
-        <!-- 5. My Page View -->
+        <!-- 7. My Page View -->
         <div id="myPageView" class="w-full hidden">
             <div class="mb-6 flex justify-between items-center">
                 <button onclick="showSection('rankings')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1">
@@ -384,7 +442,7 @@
             </div>
         </div>
 
-        <!-- 6. Rankings View -->
+        <!-- 8. Rankings View -->
         <div id="rankingsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -415,7 +473,7 @@
             </div>
         </div>
 
-        <!-- 7. Tiers System Guide View -->
+        <!-- 9. Tiers System Guide View -->
         <div id="tiersView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -509,6 +567,27 @@
         </div>
     </div>
 
+    <!-- Community Post Modal -->
+    <div id="postModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex justify-center items-center px-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg p-8 rounded-2xl shadow-2xl relative text-left">
+            <button onclick="closePostModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white font-bold text-lg">✕</button>
+            <h3 class="text-xl font-black text-white mb-2">새 글 작성</h3>
+            <p class="text-xs text-slate-400 mb-6">자유게시판에 공유할 내용을 입력하세요. (개발자 계정은 공지사항으로 등록됩니다)</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">제목</label>
+                    <input type="text" id="postTitleInput" placeholder="제목을 입력하세요" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">내용</label>
+                    <textarea id="postContentInput" rows="5" placeholder="내용을 입력하세요..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+                <button onclick="submitCommunityPost()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">등록하기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="w-full border-t border-slate-900 py-6 text-center text-xs text-slate-600 mt-auto">
         &copy; 2026 MATHISM. All rights reserved.
@@ -529,6 +608,7 @@
 
         const authModal = document.getElementById('authModal');
         const nicknameModal = document.getElementById('nicknameModal');
+        const postModal = document.getElementById('postModal');
         const authContainer = document.getElementById('authContainer');
         const registerBtn = document.getElementById('registerBtn');
         const registerBtnInList = document.getElementById('registerBtnInList');
@@ -585,8 +665,18 @@
             authModal.classList.remove('hidden');
         }
         function closeAuthModal() { authModal.classList.add('hidden'); }
+        
+        function openPostModal() {
+            if (!currentUser) {
+                alert('로그인이 필요한 기능입니다.');
+                openAuthModal();
+                return;
+            }
+            postModal.classList.remove('hidden');
+        }
+        function closePostModal() { postModal.classList.add('hidden'); }
 
-        async function showSection(section, probData = null) {
+        async function showSection(section, dataObj = null) {
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('problemsView').classList.add('hidden');
             document.getElementById('problemDetailView').classList.add('hidden');
@@ -594,15 +684,23 @@
             document.getElementById('myPageView').classList.add('hidden');
             document.getElementById('rankingsView').classList.add('hidden');
             document.getElementById('tiersView').classList.add('hidden');
+            document.getElementById('communityView').classList.add('hidden');
+            document.getElementById('postDetailView').classList.add('hidden');
 
             if (section === 'home') {
                 document.getElementById('homeView').classList.remove('hidden');
             } else if (section === 'problems') {
                 document.getElementById('problemsView').classList.remove('hidden');
                 await loadProblemTable();
-            } else if (section === 'detail' && probData) {
+            } else if (section === 'detail' && dataObj) {
                 document.getElementById('problemDetailView').classList.remove('hidden');
-                await renderProblemDetail(probData);
+                await renderProblemDetail(dataObj);
+            } else if (section === 'community') {
+                document.getElementById('communityView').classList.remove('hidden');
+                await loadCommunityPosts();
+            } else if (section === 'postDetail' && dataObj) {
+                document.getElementById('postDetailView').classList.remove('hidden');
+                renderPostDetail(dataObj);
             } else if (section === 'create') {
                 if (!currentUser) {
                     alert('로그인이 필요한 기능입니다.');
@@ -955,6 +1053,115 @@
             location.reload();
         }
 
+        // --- 자유게시판 로직 ---
+        async function loadCommunityPosts() {
+            const tbody = document.getElementById('postsTableBody');
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">게시글을 불러오는 중...</td></tr>`;
+
+            const { data, error } = await supabaseClient
+                .from('community_posts')
+                .select('*, profiles(nickname)')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">게시글을 불러오지 못했습니다. (테이블 생성을 확인하세요)</td></tr>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">등록된 글이 없습니다. 첫 글을 작성해 보세요!</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(post => {
+                const isNotice = post.is_notice;
+                const authorNick = post.profiles ? post.profiles.nickname : '익명';
+                const isDev = currentUser && currentUser.email === DEVELOPER_EMAIL;
+                const isAuthor = currentUser && currentUser.id === post.user_id;
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition cursor-pointer';
+                tr.onclick = (e) => {
+                    // 삭제 버튼 클릭 시 상세 보기 방지
+                    if (e.target.tagName === 'BUTTON') return;
+                    showSection('postDetail', post);
+                };
+
+                tr.innerHTML = `
+                    <td class="py-4 px-6 text-center">
+                        ${isNotice ? '<span class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/30">공지</span>' : '<span class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 text-xs">일반</span>'}
+                    </td>
+                    <td class="py-4 px-6 font-semibold text-slate-200 hover:text-indigo-300">${escapeHtml(post.title)}</td>
+                    <td class="py-4 px-6 text-center text-xs text-slate-400">${escapeHtml(authorNick)}</td>
+                    <td class="py-4 px-6 text-center text-xs text-slate-500">${new Date(post.created_at).toLocaleDateString()}</td>
+                    <td class="py-4 px-6 text-center">
+                        ${(isDev || isAuthor) ? `<button onclick="deletePost(${post.id})" class="px-2.5 py-1 rounded bg-rose-950 hover:bg-rose-900 text-rose-400 border border-rose-800 text-xs font-bold transition">삭제</button>` : '<span class="text-xs text-slate-600">-</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function submitCommunityPost() {
+            if (!currentUser) { alert('로그인이 필요합니다.'); return; }
+            const title = document.getElementById('postTitleInput').value.trim();
+            const content = document.getElementById('postContentInput').value.trim();
+
+            if (!title || !content) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+
+            const isDev = currentUser.email === DEVELOPER_EMAIL;
+
+            const { error } = await supabaseClient
+                .from('community_posts')
+                .insert({
+                    title,
+                    content,
+                    user_id: currentUser.id,
+                    is_notice: isDev // 개발자 계정이면 자동으로 공지사항 등록
+                });
+
+            if (error) {
+                alert('글 등록 실패: ' + error.message);
+            } else {
+                document.getElementById('postTitleInput').value = '';
+                document.getElementById('postContentInput').value = '';
+                closePostModal();
+                await loadCommunityPosts();
+            }
+        }
+
+        async function deletePost(postId) {
+            if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
+
+            const { error } = await supabaseClient
+                .from('community_posts')
+                .delete()
+                .eq('id', postId);
+
+            if (error) {
+                alert('게시글 삭제 실패: ' + error.message);
+            } else {
+                alert('게시글이 삭제되었습니다.');
+                await loadCommunityPosts();
+            }
+        }
+
+        function renderPostDetail(post) {
+            const badgeContainer = document.getElementById('postDetailBadgeContainer');
+            badgeContainer.innerHTML = post.is_notice 
+                ? '<span class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/30">공지사항</span>' 
+                : '<span class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 text-xs font-bold">자유게시판</span>';
+
+            document.getElementById('postDetailTitle').textContent = post.title;
+            document.getElementById('postDetailAuthor').textContent = `작성자: ${post.profiles ? post.profiles.nickname : '익명'}`;
+            document.getElementById('postDetailDate').textContent = `작성일: ${new Date(post.created_at).toLocaleString()}`;
+            document.getElementById('postDetailContent').textContent = post.content;
+        }
+
         async function submitNewProblem() {
             if (!currentUser) { alert('로그인이 필요합니다.'); return; }
             const category = document.getElementById('createCategory').value;
@@ -1109,7 +1316,6 @@
             });
         }
 
-        // 정올 스타일 탭 전환 제어 함수
         function switchProblemTab(tabName) {
             const tabProblem = document.getElementById('tabContentProblem');
             const tabEditorial = document.getElementById('tabContentEditorial');
@@ -1119,7 +1325,6 @@
             const btnEditorial = document.getElementById('tabBtnEditorial');
             const btnVote = document.getElementById('tabBtnVote');
 
-            // 초기화
             tabProblem.classList.add('hidden');
             tabEditorial.classList.add('hidden');
             tabVote.classList.add('hidden');
@@ -1147,7 +1352,6 @@
             currentProblemUserId = prob.user_id;
             currentProblemIsFixed = prob.is_fixed || false;
 
-            // 기본 탭(문제 설명)으로 항상 진입
             switchProblemTab('problem');
 
             document.getElementById('detailCategoryBadge').textContent = prob.category || '대수';
@@ -1212,7 +1416,6 @@
                 `;
             }
 
-            // 풀이 토론 권한 검증 (맞힌 유저 또는 개발자만 작성 가능)
             const editorialLockedMsg = document.getElementById('editorialLockedMsg');
             const editorialFormBox = document.getElementById('editorialFormBox');
             if (currentUser && (userSolvedProblemIds.has(prob.id) || isDeveloper)) {
@@ -1225,7 +1428,6 @@
                 await loadEditorials(prob.id);
             }
 
-            // 투표 탭 권한 제어
             const voteButtonContainer = document.getElementById('voteButtonContainer');
             const voteDesc = document.getElementById('voteDesc');
             const userScore = userProfileCache ? (userProfileCache.score || 0) : 0;
@@ -1430,7 +1632,6 @@
                 userSolvedProblemIds.add(currentProblemId);
                 document.getElementById('detailSolvedBadge').classList.remove('hidden');
                 
-                // 정답 맞히면 풀이 토론 탭 잠금 해제
                 document.getElementById('editorialLockedMsg').classList.add('hidden');
                 document.getElementById('editorialFormBox').classList.remove('hidden');
                 await loadEditorials(currentProblemId);
