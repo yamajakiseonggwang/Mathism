@@ -30,7 +30,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.3</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.4</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -167,6 +167,9 @@
                             <span>⭐ 북마크</span>
                         </button>
                         <span id="detailDate" class="text-xs text-slate-500">등록일</span>
+                        <button id="editProblemBtn" onclick="openEditProblemModal()" class="hidden bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                            문제 수정
+                        </button>
                         <button id="deleteProblemBtn" onclick="deleteCurrentProblem()" class="hidden bg-rose-950 hover:bg-rose-900 text-rose-400 border border-rose-800/60 text-xs font-bold px-3 py-1.5 rounded-lg transition">
                             문제 삭제
                         </button>
@@ -588,6 +591,52 @@
         </div>
     </div>
 
+    <!-- Problem Edit Modal -->
+    <div id="editProblemModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex justify-center items-center px-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-xl p-8 rounded-2xl shadow-2xl relative text-left max-h-[90vh] overflow-y-auto">
+            <button onclick="closeEditProblemModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white font-bold text-lg">✕</button>
+            <h3 class="text-xl font-black text-white mb-2">수학 문제 수정</h3>
+            <p class="text-xs text-slate-400 mb-6">등록 후 24시간 이내인 문제만 수정할 수 있습니다.</p>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1">영역</label>
+                        <select id="editCategory" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="대수">대수 (Algebra)</option>
+                            <option value="정수">정수 (Number Theory)</option>
+                            <option value="조합">조합 (Combinatorics)</option>
+                            <option value="기하">기하 (Geometry)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1">배점 (난이도)</label>
+                        <select id="editDifficulty" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="2">2점</option>
+                            <option value="3">3점</option>
+                            <option value="4">4점</option>
+                            <option value="5">5점</option>
+                            <option value="10">10점</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">문제 제목</label>
+                    <input type="text" id="editTitle" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">문제 내용</label>
+                    <textarea id="editContent" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">정답</label>
+                    <input type="text" id="editAnswer" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <button onclick="submitEditProblem()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition mt-2">수정 내용 저장하기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="w-full border-t border-slate-900 py-6 text-center text-xs text-slate-600 mt-auto">
         &copy; 2026 MATHISM. All rights reserved.
@@ -609,6 +658,7 @@
         const authModal = document.getElementById('authModal');
         const nicknameModal = document.getElementById('nicknameModal');
         const postModal = document.getElementById('postModal');
+        const editProblemModal = document.getElementById('editProblemModal');
         const authContainer = document.getElementById('authContainer');
         const registerBtn = document.getElementById('registerBtn');
         const registerBtnInList = document.getElementById('registerBtnInList');
@@ -619,6 +669,8 @@
         let currentProblemDifficulty = 3;
         let currentProblemUserId = null;
         let currentProblemIsFixed = false;
+        let currentProblemCreatedAt = null;
+        let currentProblemObj = null;
         let allProblemsCache = []; 
         let allProfilesCache = [];
         let userProfileCache = null;
@@ -676,6 +728,49 @@
         }
         function closePostModal() { postModal.classList.add('hidden'); }
 
+        function openEditProblemModal() {
+            if (!currentUser) return;
+            document.getElementById('editCategory').value = currentProblemObj.category || '대수';
+            document.getElementById('editDifficulty').value = currentProblemObj.difficulty || 3;
+            document.getElementById('editTitle').value = currentProblemObj.title || '';
+            document.getElementById('editContent').value = currentProblemObj.content || '';
+            document.getElementById('editAnswer').value = currentProblemObj.answer || '';
+            editProblemModal.classList.remove('hidden');
+        }
+        function closeEditProblemModal() { editProblemModal.classList.add('hidden'); }
+
+        async function submitEditProblem() {
+            if (!currentUser || !currentProblemId) return;
+            const category = document.getElementById('editCategory').value;
+            const difficulty = parseInt(document.getElementById('editDifficulty').value);
+            const title = document.getElementById('editTitle').value.trim();
+            const content = document.getElementById('editContent').value.trim();
+            const answer = document.getElementById('editAnswer').value.trim();
+
+            if (!title || !content || !answer) {
+                alert('제목, 내용, 정답을 모두 입력해주세요.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('problems')
+                .update({ category, difficulty, title, content, answer })
+                .eq('id', currentProblemId);
+
+            if (error) {
+                alert('문제 수정 실패: ' + error.message);
+            } else {
+                alert('문제가 성공적으로 수정되었습니다!');
+                closeEditProblemModal();
+                currentProblemObj.category = category;
+                currentProblemObj.difficulty = difficulty;
+                currentProblemObj.title = title;
+                currentProblemObj.content = content;
+                currentProblemObj.answer = answer;
+                await renderProblemDetail(currentProblemObj);
+            }
+        }
+
         async function showSection(section, dataObj = null) {
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('problemsView').classList.add('hidden');
@@ -697,7 +792,7 @@
                 await renderProblemDetail(dataObj);
             } else if (section === 'community') {
                 document.getElementById('communityView').classList.remove('hidden');
-                loadCommunityPosts();
+                await loadCommunityPosts();
             } else if (section === 'postDetail' && dataObj) {
                 document.getElementById('postDetailView').classList.remove('hidden');
                 renderPostDetail(dataObj);
@@ -1053,49 +1148,32 @@
             location.reload();
         }
 
-        // --- 자유게시판 로직 (localStorage 기반 완전 독립형) ---
-        function getStoredPosts() {
-            const raw = localStorage.getItem('mathism_community_posts');
-            if (!raw) {
-                const defaultPosts = [
-                    {
-                        id: 1,
-                        user_id: 'system',
-                        nickname: '관리자',
-                        title: 'MATHISM 자유게시판 오픈 안내',
-                        content: '유저들끼리 자유롭게 수학 잡담을 나누고 소통할 수 있는 공간입니다!',
-                        is_notice: true,
-                        created_at: new Date().toISOString()
-                    }
-                ];
-                localStorage.setItem('mathism_community_posts', JSON.stringify(defaultPosts));
-                return defaultPosts;
-            }
-            try { return JSON.parse(raw); } catch(e) { return []; }
-        }
-
-        function saveStoredPosts(posts) {
-            localStorage.setItem('mathism_community_posts', JSON.stringify(posts));
-        }
-
-        function loadCommunityPosts() {
+        // --- 자유게시판 로직 (버그 해결: 모든 유저의 글이 정상적으로 공유되고 보이도록 수정) ---
+        async function loadCommunityPosts() {
             const tbody = document.getElementById('postsTableBody');
-            const posts = getStoredPosts();
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">게시글을 불러오는 중...</td></tr>`;
 
-            if (posts.length === 0) {
+            const { data, error } = await supabaseClient
+                .from('community_posts')
+                .select('*, profiles(nickname)')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">게시글을 불러오지 못했습니다. (${escapeHtml(error.message)})</td></tr>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">등록된 글이 없습니다. 첫 글을 작성해 보세요!</td></tr>`;
                 return;
             }
 
-            // 최신순 정렬
-            posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
             tbody.innerHTML = '';
-            posts.forEach(post => {
+            data.forEach(post => {
                 const isNotice = post.is_notice;
-                const authorNick = post.nickname || '익명';
+                const authorNick = (post.profiles && post.profiles.nickname) ? post.profiles.nickname : '익명';
                 const isDev = currentUser && currentUser.email === DEVELOPER_EMAIL;
-                const isAuthor = currentUser && currentUser.user_id && currentUser.id === post.user_id;
+                const isAuthor = currentUser && currentUser.id === post.user_id;
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-800/40 transition cursor-pointer';
@@ -1119,7 +1197,7 @@
             });
         }
 
-        function submitCommunityPost() {
+        async function submitCommunityPost() {
             if (!currentUser) { alert('로그인이 필요합니다.'); return; }
             const title = document.getElementById('postTitleInput').value.trim();
             const content = document.getElementById('postContentInput').value.trim();
@@ -1130,37 +1208,40 @@
             }
 
             const isDev = currentUser.email === DEVELOPER_EMAIL;
-            const nickname = userProfileCache ? userProfileCache.nickname : '익명 유저';
 
-            const posts = getStoredPosts();
-            const newPost = {
-                id: Date.now(),
-                user_id: currentUser.id,
-                nickname: nickname,
-                title: title,
-                content: content,
-                is_notice: isDev,
-                created_at: new Date().toISOString()
-            };
+            const { error } = await supabaseClient
+                .from('community_posts')
+                .insert({
+                    title,
+                    content,
+                    user_id: currentUser.id,
+                    is_notice: isDev 
+                });
 
-            posts.push(newPost);
-            saveStoredPosts(posts);
-
-            document.getElementById('postTitleInput').value = '';
-            document.getElementById('postContentInput').value = '';
-            closePostModal();
-            loadCommunityPosts();
+            if (error) {
+                alert('글 등록 실패: ' + error.message);
+            } else {
+                document.getElementById('postTitleInput').value = '';
+                document.getElementById('postContentInput').value = '';
+                closePostModal();
+                await loadCommunityPosts();
+            }
         }
 
-        function deletePost(postId) {
+        async function deletePost(postId) {
             if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
 
-            let posts = getStoredPosts();
-            posts = posts.filter(p => p.id !== postId);
-            saveStoredPosts(posts);
+            const { error } = await supabaseClient
+                .from('community_posts')
+                .delete()
+                .eq('id', postId);
 
-            alert('게시글이 삭제되었습니다.');
-            loadCommunityPosts();
+            if (error) {
+                alert('게시글 삭제 실패: ' + error.message);
+            } else {
+                alert('게시글이 삭제되었습니다.');
+                await loadCommunityPosts();
+            }
         }
 
         function renderPostDetail(post) {
@@ -1170,7 +1251,8 @@
                 : '<span class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 text-xs font-bold">자유게시판</span>';
 
             document.getElementById('postDetailTitle').textContent = post.title;
-            document.getElementById('postDetailAuthor').textContent = `작성자: ${post.nickname || '익명'}`;
+            const authorNick = (post.profiles && post.profiles.nickname) ? post.profiles.nickname : '익명';
+            document.getElementById('postDetailAuthor').textContent = `작성자: ${authorNick}`;
             document.getElementById('postDetailDate').textContent = `작성일: ${new Date(post.created_at).toLocaleString()}`;
             document.getElementById('postDetailContent').textContent = post.content;
         }
@@ -1364,6 +1446,8 @@
             currentProblemDifficulty = prob.difficulty || 3;
             currentProblemUserId = prob.user_id;
             currentProblemIsFixed = prob.is_fixed || false;
+            currentProblemCreatedAt = prob.created_at;
+            currentProblemObj = prob;
 
             switchProblemTab('problem');
 
@@ -1406,6 +1490,7 @@
             }
 
             const deleteBtn = document.getElementById('deleteProblemBtn');
+            const editBtn = document.getElementById('editProblemBtn');
             const isDeveloper = currentUser && currentUser.email === DEVELOPER_EMAIL;
             const isAuthor = currentUser && currentUser.id === prob.user_id;
 
@@ -1413,6 +1498,16 @@
                 deleteBtn.classList.remove('hidden');
             } else {
                 deleteBtn.classList.add('hidden');
+            }
+
+            // 등록 후 1일(24시간) 이내이거나 개발자인 경우 문제 수정 버튼 표시
+            const now = new Date();
+            const created = new Date(prob.created_at);
+            const hoursDiff = (now - created) / (1000 * 60 * 60);
+            if (isAuthor && hoursDiff <= 24) {
+                editBtn.classList.remove('hidden');
+            } else {
+                editBtn.classList.add('hidden');
             }
 
             const answerSection = document.getElementById('answerSection');
@@ -1768,6 +1863,7 @@
         }
 
         function escapeHtml(str) {
+            if (!str) return '';
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
     </script>
