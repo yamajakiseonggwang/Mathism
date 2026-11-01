@@ -30,7 +30,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v2.7</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v2.9</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -76,15 +76,14 @@
             </div>
         </div>
 
-        <!-- 2. Problems List View -->
+        <!-- 2. Problems List View (영역별·난이도별 필터링 추가) -->
         <div id="problemsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-2xl font-black text-white">문제 은행 & 검색</h2>
-                    <p class="text-xs text-slate-400 mt-1">문제 제목, 내용 뿐만 아니라 유저 닉네임으로도 검색이 가능합니다.</p>
+                    <h2 class="text-2xl font-black text-white">문제 은행 & 필터</h2>
+                    <p class="text-xs text-slate-400 mt-1">영역 및 난이도별로 필터링하거나 검색할 수 있습니다.</p>
                 </div>
                 <div class="flex items-center space-x-3 w-full md:w-auto">
-                    <input type="text" id="searchInput" oninput="filterProblemsAndUsers()" placeholder="문제 또는 유저 검색..." class="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 w-full md:w-60">
                     <button onclick="showSection('create')" id="registerBtnInList" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition whitespace-nowrap">
                         + 문제 등록
                     </button>
@@ -92,6 +91,26 @@
                         홈으로
                     </button>
                 </div>
+            </div>
+
+            <!-- 필터 바 영역 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                <select id="filterCategory" onchange="filterProblemTable()" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <option value="all">모든 영역 (전체)</option>
+                    <option value="대수">대수 (Algebra)</option>
+                    <option value="정수">정수 (Number Theory)</option>
+                    <option value="조합">조합 (Combinatorics)</option>
+                    <option value="기하">기하 (Geometry)</option>
+                </select>
+                <select id="filterDifficulty" onchange="filterProblemTable()" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <option value="all">모든 난이도 (전체)</option>
+                    <option value="2">2점 (매우 쉬움)</option>
+                    <option value="3">3점 (보통)</option>
+                    <option value="4">4점 (어려움)</option>
+                    <option value="5">5점 (매우 어려움)</option>
+                    <option value="10">10점 (최고 난이도)</option>
+                </select>
+                <input type="text" id="searchInput" oninput="filterProblemTable()" placeholder="문제 제목 또는 유저 검색..." class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
             </div>
 
             <div id="searchUserResultContainer" class="hidden mb-6 bg-slate-900/40 border border-indigo-500/30 p-4 rounded-xl">
@@ -119,7 +138,7 @@
             </div>
         </div>
 
-        <!-- 3. Problem Detail View -->
+        <!-- 3. Problem Detail View (한글화, 북마크, 풀이 토론 탭 추가) -->
         <div id="problemDetailView" class="w-full hidden">
             <div class="mb-6">
                 <button onclick="showSection('problems')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
@@ -135,6 +154,9 @@
                         <h2 id="detailTitle" class="text-2xl font-black text-white">문제 제목</h2>
                     </div>
                     <div class="flex items-center space-x-3">
+                        <button id="bookmarkBtn" onclick="toggleBookmark()" class="bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1">
+                            <span>⭐ 북마크</span>
+                        </button>
                         <span id="detailDate" class="text-xs text-slate-500">등록일</span>
                         <button id="deleteProblemBtn" onclick="deleteCurrentProblem()" class="hidden bg-rose-950 hover:bg-rose-900 text-rose-400 border border-rose-800/60 text-xs font-bold px-3 py-1.5 rounded-lg transition">
                             문제 삭제
@@ -144,7 +166,7 @@
             </div>
 
             <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
-                <div class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Problem Description</div>
+                <div class="text-xs font-bold text-indigo-400 uppercase tracking-widest">문제 설명</div>
                 <div id="detailContent" class="text-slate-200 text-base font-medium whitespace-pre-wrap leading-relaxed"></div>
                 
                 <div id="detailImageContainer" class="hidden my-4 text-center">
@@ -159,6 +181,27 @@
                         <button id="submitAnswerBtn" onclick="verifyDetailAnswer()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-8 py-3 rounded-xl transition shadow-lg shadow-indigo-600/30">정답 제출</button>
                     </div>
                     <div id="detailResult" class="text-sm font-bold"></div>
+                </div>
+
+                <!-- 풀이 토론 및 아이디어 공유 탭 (맞힌 유저만 참여 가능) -->
+                <div id="editorialSection" class="hidden border-t border-slate-800 pt-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-bold text-emerald-400 flex items-center space-x-1">
+                            <span>💬 풀이 토론 및 아이디어 공유 (Editorial)</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400">문제를 해결한 학습자만 작성할 수 있습니다.</span>
+                    </div>
+                    
+                    <div class="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                        <textarea id="editorialInput" rows="3" placeholder="자신만의 접근법, 수식 유도 과정, 보조선 활용법을 LaTeX 수식과 함께 공유해보세요..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+                        <div class="flex justify-end">
+                            <button onclick="submitEditorial()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-5 py-2 rounded-lg transition shadow">풀이 공유하기</button>
+                        </div>
+                    </div>
+
+                    <div id="editorialList" class="space-y-3 pt-2">
+                        <!-- 토론 댓글 목록 동적 로딩 -->
+                    </div>
                 </div>
 
                 <div id="voteSection" class="hidden border-t border-slate-800 pt-6 space-y-3">
@@ -245,7 +288,7 @@
             </div>
         </div>
 
-        <!-- 5. My Page View -->
+        <!-- 5. My Page View (북마크 탭 추가) -->
         <div id="myPageView" class="w-full hidden">
             <div class="mb-6 flex justify-between items-center">
                 <button onclick="showSection('rankings')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1">
@@ -302,14 +345,23 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-3xl backdrop-blur space-y-4 shadow-xl">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-black text-white flex items-center space-x-2">
+                <!-- 아카이브 탭 (해결한 문제 / 북마크한 문제) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur space-y-4 shadow-xl">
+                        <h3 class="text-sm font-black text-white flex items-center space-x-2">
                             <span>📚 해결한 문제 아카이브</span>
                         </h3>
+                        <div id="solvedProblemsList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                            <p class="text-xs text-slate-500 text-center py-6">불러오는 중...</p>
+                        </div>
                     </div>
-                    <div id="solvedProblemsList" class="space-y-2 max-h-72 overflow-y-auto pr-1">
-                        <p class="text-xs text-slate-500 text-center py-8">해결한 문제를 불러오는 중...</p>
+                    <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur space-y-4 shadow-xl">
+                        <h3 class="text-sm font-black text-amber-400 flex items-center space-x-2">
+                            <span>⭐ 북마크한 문제 (다시 볼 문제)</span>
+                        </h3>
+                        <div id="bookmarkedProblemsList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                            <p class="text-xs text-slate-500 text-center py-6">불러오는 중...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -474,6 +526,7 @@
         let allProfilesCache = [];
         let userProfileCache = null;
         let userSolvedProblemIds = new Set();
+        let userBookmarkedProblemIds = new Set();
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!supabaseClient) return;
@@ -482,23 +535,28 @@
                 if (session) {
                     currentUser = session.user;
                     await checkAndRenderProfile(currentUser);
-                    await loadUserSolvedProblems();
+                    await loadUserSolvedAndBookmarks();
                 }
             } catch (err) {
                 console.error("세션 확인 중 오류:", err);
             }
         });
 
-        async function loadUserSolvedProblems() {
+        async function loadUserSolvedAndBookmarks() {
             if (!currentUser) return;
-            const { data } = await supabaseClient
-                .from('problem_solves')
-                .select('problem_id')
-                .eq('user_id', currentUser.id);
+            const [solvesRes, bookmarksRes] = await Promise.all([
+                supabaseClient.from('problem_solves').select('problem_id').eq('user_id', currentUser.id),
+                supabaseClient.from('problem_bookmarks').select('problem_id').eq('user_id', currentUser.id)
+            ]);
 
             userSolvedProblemIds.clear();
-            if (data) {
-                data.forEach(s => userSolvedProblemIds.add(s.problem_id));
+            if (solvesRes.data) {
+                solvesRes.data.forEach(s => userSolvedProblemIds.add(s.problem_id));
+            }
+
+            userBookmarkedProblemIds.clear();
+            if (bookmarksRes.data) {
+                bookmarksRes.data.forEach(b => userBookmarkedProblemIds.add(b.problem_id));
             }
         }
 
@@ -527,7 +585,7 @@
                 await loadProblemTable();
             } else if (section === 'detail' && probData) {
                 document.getElementById('problemDetailView').classList.remove('hidden');
-                renderProblemDetail(probData);
+                await renderProblemDetail(probData);
             } else if (section === 'create') {
                 if (!currentUser) {
                     alert('로그인이 필요한 기능입니다.');
@@ -571,7 +629,7 @@
                 nicknameModal.classList.remove('hidden');
             } else {
                 userProfileCache = data;
-                await loadUserSolvedProblems();
+                await loadUserSolvedAndBookmarks();
                 await renderLoggedInState(data);
             }
         }
@@ -687,6 +745,7 @@
             const preview = document.getElementById('myPageAvatarPreview');
             preview.src = targetProfile.avatar_url || 'https://via.placeholder.com/150';
 
+            // 해결한 문제 목록
             const { data: solvesData } = await supabaseClient
                 .from('problem_solves')
                 .select('problem_id, solved_at, problems(id, title, category, difficulty)')
@@ -707,26 +766,55 @@
             accuracyEl.textContent = `${accuracy}% (${solvedCount}문제)`;
 
             if (!solvesData || solvesData.length === 0) {
-                solvedListContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">아직 해결한 문제가 없습니다.</p>`;
+                solvedListContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">아직 해결한 문제가 없습니다.</p>`;
             } else {
                 solvedListContainer.innerHTML = '';
                 solvesData.forEach(item => {
                     const p = item.problems;
                     if (!p) return;
                     const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-indigo-500/40 transition cursor-pointer';
+                    div.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-indigo-500/40 transition cursor-pointer';
                     div.onclick = () => showSection('detail', p);
                     div.innerHTML = `
                         <div class="flex items-center space-x-3">
                             <span class="text-xs px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">#${p.id}</span>
                             <span class="text-sm font-semibold text-slate-200">${escapeHtml(p.title)}</span>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="text-xs px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">🔥 ${p.difficulty}점</span>
-                            <span class="text-xs text-slate-500">${new Date(item.solved_at).toLocaleDateString()}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">🔥 ${p.difficulty}점</span>
                         </div>
                     `;
                     solvedListContainer.appendChild(div);
+                });
+            }
+
+            // 북마크한 문제 목록 (다시 볼 문제 / 오답 노트)
+            const { data: bookmarksData } = await supabaseClient
+                .from('problem_bookmarks')
+                .select('problem_id, problems(id, title, category, difficulty)')
+                .eq('user_id', targetUserId);
+
+            const bookmarkedListContainer = document.getElementById('bookmarkedProblemsList');
+            if (!bookmarksData || bookmarksData.length === 0) {
+                bookmarkedListContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">북마크한 문제가 없습니다.</p>`;
+            } else {
+                bookmarkedListContainer.innerHTML = '';
+                bookmarksData.forEach(item => {
+                    const p = item.problems;
+                    if (!p) return;
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-amber-500/40 transition cursor-pointer';
+                    div.onclick = () => showSection('detail', p);
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xs px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">#${p.id}</span>
+                            <span class="text-sm font-semibold text-slate-200">${escapeHtml(p.title)}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">🔥 ${p.difficulty}점</span>
+                        </div>
+                    `;
+                    bookmarkedListContainer.appendChild(div);
                 });
             }
 
@@ -914,7 +1002,7 @@
         }
 
         async function loadProblemTable() {
-            await loadUserSolvedProblems();
+            await loadUserSolvedAndBookmarks();
             const tbody = document.getElementById('problemTableBody');
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">문제를 불러오는 중...</td></tr>`;
 
@@ -934,13 +1022,55 @@
 
             allProblemsCache = data || [];
             allProfilesCache = profilesData || [];
-            renderTableRows(allProblemsCache);
+            filterProblemTable();
+        }
+
+        // 영역 및 난이도별 필터링 + 검색 통합 함수
+        function filterProblemTable() {
+            const catFilter = document.getElementById('filterCategory').value;
+            const diffFilter = document.getElementById('filterDifficulty').value;
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            const filtered = allProblemsCache.filter(prob => {
+                const matchCat = (catFilter === 'all' || prob.category === catFilter);
+                const matchDiff = (diffFilter === 'all' || prob.difficulty.toString() === diffFilter);
+                const matchKeyword = !keyword || 
+                    prob.title.toLowerCase().includes(keyword) || 
+                    prob.content.toLowerCase().includes(keyword) ||
+                    (prob.category && prob.category.toLowerCase().includes(keyword));
+                return matchCat && matchDiff && matchKeyword;
+            });
+
+            renderTableRows(filtered);
+
+            // 유저 검색 칩 처리
+            const userResultContainer = document.getElementById('searchUserResultContainer');
+            const userListEl = document.getElementById('searchUserList');
+            if (!keyword) {
+                userResultContainer.classList.add('hidden');
+                return;
+            }
+
+            const matchedUsers = allProfilesCache.filter(p => p.nickname && p.nickname.toLowerCase().includes(keyword));
+            if (matchedUsers.length > 0) {
+                userListEl.innerHTML = '';
+                matchedUsers.forEach(u => {
+                    const btn = document.createElement('button');
+                    btn.className = 'px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-indigo-500 text-xs font-bold text-indigo-300 transition flex items-center space-x-1';
+                    btn.onclick = () => viewUserProfile(u.id);
+                    btn.textContent = `👤 ${u.nickname} (${u.score || 0}점)`;
+                    userListEl.appendChild(btn);
+                });
+                userResultContainer.classList.remove('hidden');
+            } else {
+                userResultContainer.classList.add('hidden');
+            }
         }
 
         function renderTableRows(problems) {
             const tbody = document.getElementById('problemTableBody');
             if (problems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">검색된 문제가 없습니다.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-500">조건에 일치하는 문제가 없습니다.</td></tr>`;
                 return;
             }
 
@@ -966,42 +1096,8 @@
             });
         }
 
-        function filterProblemsAndUsers() {
-            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-            
-            const filteredProblems = allProblemsCache.filter(prob => 
-                prob.title.toLowerCase().includes(keyword) || 
-                prob.content.toLowerCase().includes(keyword) ||
-                (prob.category && prob.category.toLowerCase().includes(keyword))
-            );
-            renderTableRows(filteredProblems);
-
-            const userResultContainer = document.getElementById('searchUserResultContainer');
-            const userListEl = document.getElementById('searchUserList');
-
-            if (!keyword) {
-                userResultContainer.classList.add('hidden');
-                return;
-            }
-
-            const matchedUsers = allProfilesCache.filter(p => p.nickname && p.nickname.toLowerCase().includes(keyword));
-            if (matchedUsers.length > 0) {
-                userListEl.innerHTML = '';
-                matchedUsers.forEach(u => {
-                    const btn = document.createElement('button');
-                    btn.className = 'px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-indigo-500 text-xs font-bold text-indigo-300 transition flex items-center space-x-1';
-                    btn.onclick = () => viewUserProfile(u.id);
-                    btn.textContent = `👤 ${u.nickname} (${u.score || 0}점)`;
-                    userListEl.appendChild(btn);
-                });
-                userResultContainer.classList.remove('hidden');
-            } else {
-                userResultContainer.classList.add('hidden');
-            }
-        }
-
         async function renderProblemDetail(prob) {
-            await loadUserSolvedProblems();
+            await loadUserSolvedAndBookmarks();
             currentProblemId = prob.id;
             currentProblemDifficulty = prob.difficulty || 3;
             currentProblemUserId = prob.user_id;
@@ -1015,6 +1111,16 @@
                 solvedBadge.classList.remove('hidden');
             } else {
                 solvedBadge.classList.add('hidden');
+            }
+
+            // 북마크 버튼 상태 업데이트
+            const bookmarkBtn = document.getElementById('bookmarkBtn');
+            if (userBookmarkedProblemIds.has(prob.id)) {
+                bookmarkBtn.innerHTML = `<span>⭐ 북마크 취소</span>`;
+                bookmarkBtn.className = 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1';
+            } else {
+                bookmarkBtn.innerHTML = `<span>⭐ 북마크</span>`;
+                bookmarkBtn.className = 'bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1';
             }
 
             document.getElementById('detailTitle').textContent = `[#${prob.id}] ${prob.title}`;
@@ -1060,6 +1166,15 @@
                 `;
             }
 
+            // 풀이 토론 탭 제어 (문제를 맞힌 유저 또는 개발자만 작성/열람 가능하도록 설정 가능)
+            const editorialSection = document.getElementById('editorialSection');
+            if (currentUser && (userSolvedProblemIds.has(prob.id) || isDeveloper)) {
+                editorialSection.classList.remove('hidden');
+                await loadEditorials(prob.id);
+            } else {
+                editorialSection.classList.add('hidden');
+            }
+
             const voteSection = document.getElementById('voteSection');
             const voteButtonContainer = document.getElementById('voteButtonContainer');
             const voteDesc = document.getElementById('voteDesc');
@@ -1088,6 +1203,97 @@
             }
         }
 
+        // 북마크 토글 함수
+        async function toggleBookmark() {
+            if (!currentUser) {
+                alert('북마크 기능을 사용하려면 로그인이 필요합니다.');
+                openAuthModal();
+                return;
+            }
+
+            const isBookmarked = userBookmarkedProblemIds.has(currentProblemId);
+            const bookmarkBtn = document.getElementById('bookmarkBtn');
+
+            if (isBookmarked) {
+                await supabaseClient
+                    .from('problem_bookmarks')
+                    .delete()
+                    .eq('problem_id', currentProblemId)
+                    .eq('user_id', currentUser.id);
+
+                userBookmarkedProblemIds.delete(currentProblemId);
+                bookmarkBtn.innerHTML = `<span>⭐ 북마크</span>`;
+                bookmarkBtn.className = 'bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1';
+            } else {
+                await supabaseClient
+                    .from('problem_bookmarks')
+                    .insert({ problem_id: currentProblemId, user_id: currentUser.id });
+
+                userBookmarkedProblemIds.add(currentProblemId);
+                bookmarkBtn.innerHTML = `<span>⭐ 북마크 취소</span>`;
+                bookmarkBtn.className = 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1';
+            }
+        }
+
+        // 풀이 토론(Editorial) 로드 함수
+        async function loadEditorials(probId) {
+            const listEl = document.getElementById('editorialList');
+            listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">토론 내용을 불러오는 중...</p>`;
+
+            const { data, error } = await supabaseClient
+                .from('problem_editorials')
+                .select('id, content, created_at, profiles(nickname, avatar_url)')
+                .eq('problem_id', probId)
+                .order('created_at', { ascending: false });
+
+            if (error || !data || data.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">등록된 풀이가 없습니다. 첫 번째 풀이를 공유해 보세요!</p>`;
+                return;
+            }
+
+            listEl.innerHTML = '';
+            data.forEach(item => {
+                const profile = item.profiles || {};
+                const div = document.createElement('div');
+                div.className = 'p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2';
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-indigo-400">${escapeHtml(profile.nickname || '익명')}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500">${new Date(item.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed">${escapeHtml(item.content)}</div>
+                `;
+                listEl.appendChild(div);
+            });
+
+            if (window.MathJax) {
+                window.MathJax.typesetPromise([listEl]).catch(err => console.log(err));
+            }
+        }
+
+        // 풀이 토론 작성 제출 함수
+        async function submitEditorial() {
+            if (!currentUser) return;
+            const content = document.getElementById('editorialInput').value.trim();
+            if (!content) {
+                alert('공유할 풀이 내용을 입력해주세요.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('problem_editorials')
+                .insert({ problem_id: currentProblemId, user_id: currentUser.id, content });
+
+            if (error) {
+                alert('풀이 등록 실패: ' + error.message);
+            } else {
+                document.getElementById('editorialInput').value = '';
+                await loadEditorials(currentProblemId);
+            }
+        }
+
         function handleImageError() {
             const imgEl = document.getElementById('detailImage');
             const errorMsg = document.getElementById('imageErrorMsg');
@@ -1112,7 +1318,6 @@
             }
         }
 
-        // 보강된 정답 채점 및 방어 로직 (광클 방지 및 중복 체크)
         async function verifyDetailAnswer() {
             if (!currentUser) {
                 alert('정답을 제출하려면 로그인이 필요합니다.');
@@ -1135,7 +1340,6 @@
                 return;
             }
 
-            // 광클 및 중복 요청 방지를 위해 버튼 비활성화
             if (submitBtn) submitBtn.disabled = true;
 
             const uVal = parseMathValue(userAnsInput);
@@ -1151,7 +1355,6 @@
             }
 
             if (isCorrect) {
-                // 서버 단에서 이미 풀었는지 재확인 (Race Condition 방지)
                 const { data: solvedCheck } = await supabaseClient
                     .from('problem_solves')
                     .select('*')
@@ -1166,7 +1369,6 @@
                     return;
                 }
 
-                // 문제 풀이 기록 삽입 (DB 유니크 제약 조건으로 중복 방어)
                 const { error: solveError } = await supabaseClient
                     .from('problem_solves')
                     .insert({ problem_id: currentProblemId, user_id: currentUser.id });
@@ -1180,11 +1382,12 @@
 
                 userSolvedProblemIds.add(currentProblemId);
                 document.getElementById('detailSolvedBadge').classList.remove('hidden');
+                document.getElementById('editorialSection').classList.remove('hidden');
+                await loadEditorials(currentProblemId);
 
                 resultDiv.className = 'text-sm font-bold text-emerald-400 mt-2';
                 resultDiv.textContent = `🎉 정답입니다! (+${currentProblemDifficulty}점 획득)`;
 
-                // 점수 반영
                 const currentScore = userProfileCache.score || 0;
                 const newScore = currentScore + currentProblemDifficulty;
                 
