@@ -30,7 +30,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.1</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.2</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -194,7 +194,7 @@
                 </div>
             </div>
 
-            <!-- Tab 2: 풀이 토론 탭 (한국어 설명 및 깔끔한 정리) -->
+            <!-- Tab 2: 풀이 토론 탭 -->
             <div id="tabContentEditorial" class="hidden bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
                 <div class="flex items-center justify-between">
                     <div>
@@ -240,7 +240,7 @@
             </div>
         </div>
 
-        <!-- 4. Community / Free Board View (자유게시판 및 공지사항) -->
+        <!-- 4. Community / Free Board View -->
         <div id="communityView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -572,7 +572,7 @@
         <div class="bg-slate-900 border border-slate-800 w-full max-w-lg p-8 rounded-2xl shadow-2xl relative text-left">
             <button onclick="closePostModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white font-bold text-lg">✕</button>
             <h3 class="text-xl font-black text-white mb-2">새 글 작성</h3>
-            <p class="text-xs text-slate-400 mb-6">자유게시판에 공유할 내용을 입력하세요. (개발자 계정은 공지사항으로 등록됩니다)</p>
+            <p class="text-xs text-slate-400 mb-6">자유게시판에 공유할 내용을 입력하세요.</p>
             
             <div class="space-y-4">
                 <div>
@@ -1064,7 +1064,7 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">게시글을 불러오지 못했습니다. (테이블 생성을 확인하세요)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">게시글을 불러오지 못했습니다.</td></tr>`;
                 return;
             }
 
@@ -1083,7 +1083,6 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-800/40 transition cursor-pointer';
                 tr.onclick = (e) => {
-                    // 삭제 버튼 클릭 시 상세 보기 방지
                     if (e.target.tagName === 'BUTTON') return;
                     showSection('postDetail', post);
                 };
@@ -1121,7 +1120,7 @@
                     title,
                     content,
                     user_id: currentUser.id,
-                    is_notice: isDev // 개발자 계정이면 자동으로 공지사항 등록
+                    is_notice: isDev 
                 });
 
             if (error) {
