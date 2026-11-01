@@ -30,7 +30,7 @@
     <header class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center border-b border-slate-800/60">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
             <span class="text-2xl font-black tracking-tighter text-indigo-400">MATH<span class="text-white">ISM</span></span>
-            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v2.9</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">v3.0</span>
         </div>
         <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-400">
             <a href="#" onclick="showSection('problems')" class="hover:text-indigo-400 transition">문제 은행</a>
@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        <!-- 2. Problems List View (영역별·난이도별 필터링 추가) -->
+        <!-- 2. Problems List View -->
         <div id="problemsView" class="w-full hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -138,12 +138,20 @@
             </div>
         </div>
 
-        <!-- 3. Problem Detail View (한글화, 북마크, 풀이 토론 탭 추가) -->
+        <!-- 3. Problem Detail View (정올 스타일 탭 UI 적용) -->
         <div id="problemDetailView" class="w-full hidden">
             <div class="mb-6">
                 <button onclick="showSection('problems')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1 mb-4">
                     <span>← 문제 목록으로 돌아가기</span>
                 </button>
+
+                <!-- 정올 스타일 탭 네비게이션 바 -->
+                <div class="flex items-center space-x-6 border-b border-slate-800 pb-3 mb-6">
+                    <button onclick="switchProblemTab('problem')" id="tabBtnProblem" class="text-sm font-bold text-indigo-400 border-b-2 border-indigo-400 pb-3 -mb-3 transition">문제 설명</button>
+                    <button onclick="switchProblemTab('editorial')" id="tabBtnEditorial" class="text-sm font-semibold text-slate-400 hover:text-slate-200 pb-3 -mb-3 transition">풀이 토론</button>
+                    <button onclick="switchProblemTab('vote')" id="tabBtnVote" class="text-sm font-semibold text-slate-400 hover:text-slate-200 pb-3 -mb-3 transition">난이도 투표</button>
+                </div>
+
                 <div class="flex justify-between items-start">
                     <div>
                         <div class="flex items-center space-x-2 mb-2">
@@ -165,7 +173,8 @@
                 </div>
             </div>
 
-            <div class="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
+            <!-- Tab 1: 문제 설명 & 정답 제출 탭 -->
+            <div id="tabContentProblem" class="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
                 <div class="text-xs font-bold text-indigo-400 uppercase tracking-widest">문제 설명</div>
                 <div id="detailContent" class="text-slate-200 text-base font-medium whitespace-pre-wrap leading-relaxed"></div>
                 
@@ -182,39 +191,48 @@
                     </div>
                     <div id="detailResult" class="text-sm font-bold"></div>
                 </div>
+            </div>
 
-                <!-- 풀이 토론 및 아이디어 공유 탭 (맞힌 유저만 참여 가능) -->
-                <div id="editorialSection" class="hidden border-t border-slate-800 pt-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="text-xs font-bold text-emerald-400 flex items-center space-x-1">
-                            <span>💬 풀이 토론 및 아이디어 공유 (Editorial)</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400">문제를 해결한 학습자만 작성할 수 있습니다.</span>
-                    </div>
-                    
-                    <div class="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
-                        <textarea id="editorialInput" rows="3" placeholder="자신만의 접근법, 수식 유도 과정, 보조선 활용법을 LaTeX 수식과 함께 공유해보세요..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
-                        <div class="flex justify-end">
-                            <button onclick="submitEditorial()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-5 py-2 rounded-lg transition shadow">풀이 공유하기</button>
-                        </div>
-                    </div>
-
-                    <div id="editorialList" class="space-y-3 pt-2">
-                        <!-- 토론 댓글 목록 동적 로딩 -->
+            <!-- Tab 2: 풀이 토론 탭 (맞힌 유저만 참여 가능) -->
+            <div id="tabContentEditorial" class="hidden bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-black text-white">💬 풀이 토론 및 아이디어 공유 (Editorial)</h3>
+                        <p class="text-xs text-slate-400 mt-1">이 문제를 해결한 학습자만 참여하여 접근법과 수식을 공유할 수 있습니다.</p>
                     </div>
                 </div>
 
-                <div id="voteSection" class="hidden border-t border-slate-800 pt-6 space-y-3">
-                    <div class="text-xs font-bold text-amber-400 flex items-center space-x-1">
-                        <span>⭐ 이 문제의 난이도 투표하기</span>
+                <div id="editorialLockedMsg" class="hidden p-6 rounded-xl bg-slate-950 border border-slate-800 text-center text-xs text-amber-400 font-semibold">
+                    🔒 풀이 토론 탭은 **문제를 정답으로 맞힌 유저**에게만 열립니다. 문제를 먼저 해결해 보세요!
+                </div>
+
+                <div id="editorialFormBox" class="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                    <textarea id="editorialInput" rows="3" placeholder="자신만의 접근법, 수식 유도 과정, 보조선 활용법을 LaTeX 수식과 함께 공유해보세요..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+                    <div class="flex justify-end">
+                        <button onclick="submitEditorial()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-5 py-2 rounded-lg transition shadow">풀이 공유하기</button>
                     </div>
-                    <p id="voteDesc" class="text-xs text-slate-400">이 문제의 적절한 배점을 선택해 주세요.</p>
-                    <div id="voteButtonContainer" class="flex flex-wrap gap-2">
-                        <button onclick="voteDifficulty(2)" class="px-4 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500 text-xs font-bold text-slate-300 transition">2점</button>
-                        <button onclick="voteDifficulty(3)" class="px-4 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500 text-xs font-bold text-slate-300 transition">3점</button>
-                        <button onclick="voteDifficulty(4)" class="px-4 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500 text-xs font-bold text-slate-300 transition">4점</button>
-                        <button onclick="voteDifficulty(5)" class="px-4 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500 text-xs font-bold text-slate-300 transition">5점</button>
-                        <button onclick="voteDifficulty(10)" class="px-4 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500 text-xs font-bold text-slate-300 transition">10점</button>
+                </div>
+
+                <div id="editorialList" class="space-y-3 pt-2">
+                    <!-- 토론 댓글 목록 동적 로딩 -->
+                </div>
+            </div>
+
+            <!-- Tab 3: 난이도 투표 탭 -->
+            <div id="tabContentVote" class="hidden bg-slate-900/60 border border-slate-800 p-8 rounded-2xl backdrop-blur space-y-6">
+                <div>
+                    <h3 class="text-lg font-black text-white">⭐ 난이도 투표</h3>
+                    <p class="text-xs text-slate-400 mt-1">이 문제의 적절한 배점을 평가하고 난이도 보정에 참여하세요.</p>
+                </div>
+
+                <div id="voteSectionInner" class="space-y-4">
+                    <p id="voteDesc" class="text-xs text-slate-300">이 문제의 적절한 배점을 선택해 주세요.</p>
+                    <div id="voteButtonContainer" class="flex flex-wrap gap-3">
+                        <button onclick="voteDifficulty(2)" class="px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500 text-sm font-bold text-slate-300 transition">2점</button>
+                        <button onclick="voteDifficulty(3)" class="px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500 text-sm font-bold text-slate-300 transition">3점</button>
+                        <button onclick="voteDifficulty(4)" class="px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500 text-sm font-bold text-slate-300 transition">4점</button>
+                        <button onclick="voteDifficulty(5)" class="px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500 text-sm font-bold text-slate-300 transition">5점</button>
+                        <button onclick="voteDifficulty(10)" class="px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500 text-sm font-bold text-slate-300 transition">10점</button>
                     </div>
                     <div id="voteResultMsg" class="text-xs text-emerald-400 font-semibold"></div>
                 </div>
@@ -288,7 +306,7 @@
             </div>
         </div>
 
-        <!-- 5. My Page View (북마크 탭 추가) -->
+        <!-- 5. My Page View -->
         <div id="myPageView" class="w-full hidden">
             <div class="mb-6 flex justify-between items-center">
                 <button onclick="showSection('rankings')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1">
@@ -345,7 +363,6 @@
                     </div>
                 </div>
 
-                <!-- 아카이브 탭 (해결한 문제 / 북마크한 문제) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur space-y-4 shadow-xl">
                         <h3 class="text-sm font-black text-white flex items-center space-x-2">
@@ -745,7 +762,6 @@
             const preview = document.getElementById('myPageAvatarPreview');
             preview.src = targetProfile.avatar_url || 'https://via.placeholder.com/150';
 
-            // 해결한 문제 목록
             const { data: solvesData } = await supabaseClient
                 .from('problem_solves')
                 .select('problem_id, solved_at, problems(id, title, category, difficulty)')
@@ -788,7 +804,6 @@
                 });
             }
 
-            // 북마크한 문제 목록 (다시 볼 문제 / 오답 노트)
             const { data: bookmarksData } = await supabaseClient
                 .from('problem_bookmarks')
                 .select('problem_id, problems(id, title, category, difficulty)')
@@ -1025,7 +1040,6 @@
             filterProblemTable();
         }
 
-        // 영역 및 난이도별 필터링 + 검색 통합 함수
         function filterProblemTable() {
             const catFilter = document.getElementById('filterCategory').value;
             const diffFilter = document.getElementById('filterDifficulty').value;
@@ -1043,7 +1057,6 @@
 
             renderTableRows(filtered);
 
-            // 유저 검색 칩 처리
             const userResultContainer = document.getElementById('searchUserResultContainer');
             const userListEl = document.getElementById('searchUserList');
             if (!keyword) {
@@ -1096,12 +1109,46 @@
             });
         }
 
+        // 정올 스타일 탭 전환 제어 함수
+        function switchProblemTab(tabName) {
+            const tabProblem = document.getElementById('tabContentProblem');
+            const tabEditorial = document.getElementById('tabContentEditorial');
+            const tabVote = document.getElementById('tabContentVote');
+
+            const btnProblem = document.getElementById('tabBtnProblem');
+            const btnEditorial = document.getElementById('tabBtnEditorial');
+            const btnVote = document.getElementById('tabBtnVote');
+
+            // 초기화
+            tabProblem.classList.add('hidden');
+            tabEditorial.classList.add('hidden');
+            tabVote.classList.add('hidden');
+
+            btnProblem.className = 'text-sm font-semibold text-slate-400 hover:text-slate-200 pb-3 -mb-3 transition';
+            btnEditorial.className = 'text-sm font-semibold text-slate-400 hover:text-slate-200 pb-3 -mb-3 transition';
+            btnVote.className = 'text-sm font-semibold text-slate-400 hover:text-slate-200 pb-3 -mb-3 transition';
+
+            if (tabName === 'problem') {
+                tabProblem.classList.remove('hidden');
+                btnProblem.className = 'text-sm font-bold text-indigo-400 border-b-2 border-indigo-400 pb-3 -mb-3 transition';
+            } else if (tabName === 'editorial') {
+                tabEditorial.classList.remove('hidden');
+                btnEditorial.className = 'text-sm font-bold text-indigo-400 border-b-2 border-indigo-400 pb-3 -mb-3 transition';
+            } else if (tabName === 'vote') {
+                tabVote.classList.remove('hidden');
+                btnVote.className = 'text-sm font-bold text-indigo-400 border-b-2 border-indigo-400 pb-3 -mb-3 transition';
+            }
+        }
+
         async function renderProblemDetail(prob) {
             await loadUserSolvedAndBookmarks();
             currentProblemId = prob.id;
             currentProblemDifficulty = prob.difficulty || 3;
             currentProblemUserId = prob.user_id;
             currentProblemIsFixed = prob.is_fixed || false;
+
+            // 기본 탭(문제 설명)으로 항상 진입
+            switchProblemTab('problem');
 
             document.getElementById('detailCategoryBadge').textContent = prob.category || '대수';
             document.getElementById('detailDifficultyBadge').textContent = `🔥 ${currentProblemDifficulty}점`;
@@ -1113,7 +1160,6 @@
                 solvedBadge.classList.add('hidden');
             }
 
-            // 북마크 버튼 상태 업데이트
             const bookmarkBtn = document.getElementById('bookmarkBtn');
             if (userBookmarkedProblemIds.has(prob.id)) {
                 bookmarkBtn.innerHTML = `<span>⭐ 북마크 취소</span>`;
@@ -1166,22 +1212,25 @@
                 `;
             }
 
-            // 풀이 토론 탭 제어 (문제를 맞힌 유저 또는 개발자만 작성/열람 가능하도록 설정 가능)
-            const editorialSection = document.getElementById('editorialSection');
+            // 풀이 토론 권한 검증 (맞힌 유저 또는 개발자만 작성 가능)
+            const editorialLockedMsg = document.getElementById('editorialLockedMsg');
+            const editorialFormBox = document.getElementById('editorialFormBox');
             if (currentUser && (userSolvedProblemIds.has(prob.id) || isDeveloper)) {
-                editorialSection.classList.remove('hidden');
+                editorialLockedMsg.classList.add('hidden');
+                editorialFormBox.classList.remove('hidden');
                 await loadEditorials(prob.id);
             } else {
-                editorialSection.classList.add('hidden');
+                editorialLockedMsg.classList.remove('hidden');
+                editorialFormBox.classList.add('hidden');
+                await loadEditorials(prob.id);
             }
 
-            const voteSection = document.getElementById('voteSection');
+            // 투표 탭 권한 제어
             const voteButtonContainer = document.getElementById('voteButtonContainer');
             const voteDesc = document.getElementById('voteDesc');
             const userScore = userProfileCache ? (userProfileCache.score || 0) : 0;
 
             if (currentUser && (isDeveloper || userScore >= 50)) {
-                voteSection.classList.remove('hidden');
                 if (currentProblemIsFixed && !isDeveloper) {
                     voteButtonContainer.classList.add('hidden');
                     voteDesc.textContent = '🔒 이 문제는 관리자에 의해 난이도가 고정되어 있어 변경할 수 없습니다.';
@@ -1192,7 +1241,8 @@
                         : '이 문제의 적절한 배점을 선택해 주세요.';
                 }
             } else {
-                voteSection.classList.add('hidden');
+                voteButtonContainer.classList.add('hidden');
+                voteDesc.textContent = '🔒 난이도 투표는 50점 이상(실버 이상) 유저부터 참여할 수 있습니다.';
             }
 
             document.getElementById('voteResultMsg').textContent = '';
@@ -1203,7 +1253,6 @@
             }
         }
 
-        // 북마크 토글 함수
         async function toggleBookmark() {
             if (!currentUser) {
                 alert('북마크 기능을 사용하려면 로그인이 필요합니다.');
@@ -1235,7 +1284,6 @@
             }
         }
 
-        // 풀이 토론(Editorial) 로드 함수
         async function loadEditorials(probId) {
             const listEl = document.getElementById('editorialList');
             listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">토론 내용을 불러오는 중...</p>`;
@@ -1247,7 +1295,7 @@
                 .order('created_at', { ascending: false });
 
             if (error || !data || data.length === 0) {
-                listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">등록된 풀이가 없습니다. 첫 번째 풀이를 공유해 보세요!</p>`;
+                listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">등록된 풀이가 없습니다. 문제를 해결하고 첫 번째 풀이를 공유해 보세요!</p>`;
                 return;
             }
 
@@ -1255,7 +1303,7 @@
             data.forEach(item => {
                 const profile = item.profiles || {};
                 const div = document.createElement('div');
-                div.className = 'p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2';
+                div.className = 'p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2';
                 div.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
@@ -1273,7 +1321,6 @@
             }
         }
 
-        // 풀이 토론 작성 제출 함수
         async function submitEditorial() {
             if (!currentUser) return;
             const content = document.getElementById('editorialInput').value.trim();
@@ -1382,7 +1429,10 @@
 
                 userSolvedProblemIds.add(currentProblemId);
                 document.getElementById('detailSolvedBadge').classList.remove('hidden');
-                document.getElementById('editorialSection').classList.remove('hidden');
+                
+                // 정답 맞히면 풀이 토론 탭 잠금 해제
+                document.getElementById('editorialLockedMsg').classList.add('hidden');
+                document.getElementById('editorialFormBox').classList.remove('hidden');
                 await loadEditorials(currentProblemId);
 
                 resultDiv.className = 'text-sm font-bold text-emerald-400 mt-2';
